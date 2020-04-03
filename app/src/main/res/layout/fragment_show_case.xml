@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivityCovid19">
+    tools:context=".views.ShowCase">
 
-    <fragment
-        android:id="@+id/container"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/show_case_recycler_view_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/covid19_nav_layout"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

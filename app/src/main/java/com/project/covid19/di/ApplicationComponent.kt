@@ -1,13 +1,14 @@
 package com.project.covid19.di
 
 import com.project.covid19.Covid19App
+import com.project.covid19.di.viewmodel.ViewModelModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AndroidSupportInjectionModule::class, ActivityModule::class, ApplicationModule::class])
+@Component(modules = [AndroidSupportInjectionModule::class, ApplicationModule::class, ActivityModule::class, ViewModelModule::class])
 interface ApplicationComponent {
     @Component.Builder
     interface Builder {
