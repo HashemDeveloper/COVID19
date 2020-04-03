@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'com.google.gms.google-services'
+
 
 android {
     compileSdkVersion 29
@@ -165,4 +167,6 @@ dependencies {
     implementation "com.pierfrancescosoffritti.androidyoutubeplayer:core:$youtubePlayerVersion"
     //threeten
     implementation "com.jakewharton.threetenabp:threetenabp:$threeTenAbpVersion"
+    // google map
+    implementation "com.google.android.gms:play-services-maps:$googleMap"
 }

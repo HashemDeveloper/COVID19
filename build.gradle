@@ -12,8 +12,9 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:3.6.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.3.3'
         def nav_version = "2.2.1"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
         // NOTE: Do not place your application dependencies here; they belong
@@ -79,6 +80,7 @@ ext {
     flowableTextView = '2.0.5'
     youtubePlayerVersion = '10.0.5'
     threeTenAbpVersion = '1.0.5'
+    googleMap = "17.0.0"
 }
 task clean(type: Delete) {
     delete rootProject.buildDir
