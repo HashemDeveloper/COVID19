@@ -63,6 +63,6 @@ object CovoidNetworkingModule {
     @Named("base_url")
     @JvmStatic
     internal fun provideBaseUrl(baseUrl: String): String {
-        return "" //TODO: Base Url
+        return "https://corona.lmao.ninja/"
     }
 }
