@@ -1,8 +1,11 @@
 package com.project.covid19.di
 
+import com.project.covid19.views.ShowCase
 import dagger.Module
+import dagger.android.ContributesAndroidInjector
 
 @Module
-class FragmentBuilderModule {
-
+abstract class FragmentBuilderModule {
+    @ContributesAndroidInjector
+    abstract fun contributeShowCaseFragment(): ShowCase
 }
