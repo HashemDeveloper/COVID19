@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -62,16 +65,53 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         }
         this.googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(39.87432092, -104.3362578)))
         this.googleMap?.animateCamera(CameraUpdateFactory.zoomTo(8f))
+        listenForCameraChange()
     }
 
     private fun positionMyLocationButton() {
         val locationButton = (fragment_live_data_map_view_id.findViewById<View>("1".toInt())
             .parent as View).findViewById<View>("2".toInt())
+        getMapLocationBt()?.setImageResource(R.drawable.ic_gps_fixed_gray_24dp)
         val rlp =
             locationButton.layoutParams as RelativeLayout.LayoutParams
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
         rlp.setMargins(0, 0, 30, 30) // positions to right bottom
+    }
+    private fun getMapLocationBt(): ImageView? {
+        return (fragment_live_data_map_view_id.findViewById<View>("1".toInt())
+            .parent as View).findViewById<View>("2".toInt()) as ImageView
+    }
+    private fun listenForCameraChange() {
+        val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
+        val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
+        this.googleMap?.setOnCameraMoveStartedListener {resultCode ->
+            if (resultCode == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                if (googleMap?.isMyLocationEnabled!!) {
+                    googleMap?.uiSettings?.isMyLocationButtonEnabled = false
+                    getMapLocationBt()?.animation = fadeOutAnim
+                }
+                if (live_data_search_view_id.visibility == View.VISIBLE) {
+                    live_data_search_view_id.visibility = View.GONE
+                    live_data_search_view_id?.animation = fadeOutAnim
+                }
+            }
+        }
+        this.googleMap?.setOnCameraMoveCanceledListener {
+            if (!googleMap?.isMyLocationEnabled!!) {
+                googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+            }
+        }
+        this.googleMap?.setOnCameraIdleListener {
+            if (googleMap?.isMyLocationEnabled!!) {
+                this.googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+                getMapLocationBt()?.animation = fadeInAnim
+            }
+            if (live_data_search_view_id.visibility == View.GONE) {
+                live_data_search_view_id.visibility = View.VISIBLE
+                live_data_search_view_id?.animation = fadeInAnim
+            }
+        }
     }
 
     private fun checkPermission() : Boolean {
