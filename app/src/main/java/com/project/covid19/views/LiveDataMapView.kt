@@ -83,32 +83,30 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             .parent as View).findViewById<View>("2".toInt()) as ImageView
     }
     private fun listenForCameraChange() {
-        val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
-        val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
         this.googleMap?.setOnCameraMoveStartedListener {resultCode ->
             if (resultCode == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                 if (googleMap?.isMyLocationEnabled!!) {
                     googleMap?.uiSettings?.isMyLocationButtonEnabled = false
+                    val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     getMapLocationBt()?.animation = fadeOutAnim
                 }
                 if (live_data_search_view_id.visibility == View.VISIBLE) {
                     live_data_search_view_id.visibility = View.GONE
+                    val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     live_data_search_view_id?.animation = fadeOutAnim
                 }
             }
         }
-        this.googleMap?.setOnCameraMoveCanceledListener {
-            if (!googleMap?.isMyLocationEnabled!!) {
-                googleMap?.uiSettings?.isMyLocationButtonEnabled = true
-            }
-        }
+
         this.googleMap?.setOnCameraIdleListener {
             if (googleMap?.isMyLocationEnabled!!) {
                 this.googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+                val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
                 getMapLocationBt()?.animation = fadeInAnim
             }
             if (live_data_search_view_id.visibility == View.GONE) {
                 live_data_search_view_id.visibility = View.VISIBLE
+                val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
                 live_data_search_view_id?.animation = fadeInAnim
             }
         }
