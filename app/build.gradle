@@ -18,6 +18,7 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resValue "string", "google_map_key", (project.findProperty("GOOGLE_MAP_KEY") ?: "")
     }
 
     buildTypes {

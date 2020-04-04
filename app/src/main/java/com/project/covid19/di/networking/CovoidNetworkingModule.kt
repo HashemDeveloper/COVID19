@@ -2,6 +2,7 @@ package com.project.covid19.di.networking
 
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.project.covid19.BuildConfig
+import com.project.covid19.data.remote.ApiServiceModule
 import dagger.Module
 import dagger.Provides
 import okhttp3.*
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
-@Module
+@Module(includes = [ApiServiceModule::class])
 object CovoidNetworkingModule {
     private const val READ_TIME_OUT: Long = 10000L
     private const val CONNECTION_TIME_OUT: Long = 10000L
