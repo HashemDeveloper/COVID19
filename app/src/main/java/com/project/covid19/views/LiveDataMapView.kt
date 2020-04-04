@@ -1,9 +1,13 @@
 package com.project.covid19.views
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -16,6 +20,7 @@ import com.project.covid19.di.Injectable
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_live_data_map_view.*
 import timber.log.Timber
+
 
 class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     private var googleMap: GoogleMap?= null
@@ -46,8 +51,28 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
-        this.googleMap?.uiSettings!!.isMyLocationButtonEnabled = false
-        this.googleMap?.isMyLocationEnabled = true
+        if (ContextCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) ==
+            PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            googleMap!!.isMyLocationEnabled = true
+            googleMap.uiSettings.isMyLocationButtonEnabled = true
+        } else {
+            ActivityCompat.requestPermissions(
+                activity!!, arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+               100
+            )
+        }
         this.googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(40.678177, -73.944160)))
     }
 
