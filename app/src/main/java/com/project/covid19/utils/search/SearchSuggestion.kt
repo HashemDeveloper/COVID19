@@ -30,7 +30,7 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
                             if ((country.startsWith(constraint.toString(), true))
                                 || state.startsWith(constraint.toString(), true)) {
                                 val searchData: SearchHopkinData = SearchHopkinData(hopkinsData.id,country,
-                                state, hopkinsData.updatedAt, hopkinsData.stats, hopkinsData.coordinates, hopkinsData.isHistory)
+                                state, null, hopkinsData.updatedAt, hopkinsData.stats, hopkinsData.coordinates, hopkinsData.isHistory)
                                 suggestionList.add(searchData)
                                 if (limit != -1 && suggestionList.size == limit) {
                                     break

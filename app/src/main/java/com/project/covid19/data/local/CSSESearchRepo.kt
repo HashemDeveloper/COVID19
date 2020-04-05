@@ -37,8 +37,10 @@ class CSSESearchRepo @Inject constructor(): ICSSESearchRepo, CoroutineScope {
     private fun retrieveHistoryBlocking(): List<SearchHopkinData>? {
         var result: List<SearchHopkinData>?= null
         runBlocking {
-            val job: Deferred<List<SearchHopkinData>> = async { retrieveHistory()!! }
-            result = job.await()
+            if (retrieveHistory() != null) {
+                val job: Deferred<List<SearchHopkinData>> = async { retrieveHistory()!! }
+                result = job.await()
+            }
         }
         return result
     }

@@ -339,6 +339,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 this@LiveDataMapView.liveDataMapViewModel.setupSearchHistory(live_data_search_view_id)
             }
         })
+
     }
 
     private fun setupCOVID19Stat(hopkinsCSSData: SearchHopkinData, data: Stats) {

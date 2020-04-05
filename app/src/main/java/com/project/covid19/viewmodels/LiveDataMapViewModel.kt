@@ -7,8 +7,10 @@ import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.hopkinsdata.SearchHopkinData
+import com.project.covid19.utils.Constants
 import com.project.covid19.utils.search.ISearchSuggestion
 import com.project.covid19.utils.search.SearchSuggestion
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 class LiveDataMapViewModel @Inject constructor(): ViewModel() {
@@ -48,7 +50,9 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     }
 
     fun saveSearchHistory(hopkinsCSSData: SearchHopkinData) {
+        val date: OffsetDateTime = Constants.getCurrentTime()
         hopkinsCSSData.isHistory = true
+        hopkinsCSSData.date = date
         this.iSearchSuggestion.saveSuggestion(hopkinsCSSData)
     }
 }
