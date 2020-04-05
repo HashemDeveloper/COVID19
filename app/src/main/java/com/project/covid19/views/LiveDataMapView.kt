@@ -3,6 +3,8 @@ package com.project.covid19.views
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -38,6 +40,7 @@ import com.project.covid19.viewmodels.LiveDataMapViewModel
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_live_data_map_view.*
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 
@@ -122,8 +125,23 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         }
         lastKnownLocation?.let {
             moveMapCamera(it.latitude, it.longitude, 18.0f)
+            val state: String? = getCurrentState(it.latitude, it.longitude)
+            state?.let { s ->
+               val hopkinsCSSEDataRes: HopkinsCSSEDataRes? = this.liveDataMapViewModel.postDataByState(s)
+               hopkinsCSSEDataRes?.let { res ->
+                   val stats: Stats? = if (res.stats != null) res.stats else null
+                   stats?.let {data ->
+                       setupCOVID19Stat(res, data)
+                   }
+               }
+            }
         }
         listenForCameraChange()
+    }
+    private fun getCurrentState(lat: Double, lon: Double): String? {
+        val geocoder: Geocoder = Geocoder(this.context!!, Locale.getDefault())
+        val addList: List<Address> = geocoder.getFromLocation(lat, lon, 1)
+        return addList[0].adminArea
     }
 
     private fun positionMyLocationButton() {
@@ -285,19 +303,8 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 val stats: Stats? = if (hopkinsCSSData.stats != null) hopkinsCSSData.stats else null
                 if (coordinates != null) {
                     moveMapCamera(coordinates.lattitude.toDouble(), coordinates.longitude.toDouble(), 8f)
-                    fragment_data_display_holder_id.visibility = View.VISIBLE
                     stats?.let { data ->
-                        val confirmedStat: String = "Confirmed Cases ${data.confirmed}"
-                        val death_stat: String = "Deaths ${data.deaths}"
-                        val recovered: String = "Recovered ${data.recovered}"
-                        val province: String? = if (hopkinsCSSData.province != null) hopkinsCSSData.province else ""
-                        val placeName: String = "Location: ${hopkinsCSSData.country}, $province"
-                        val lastUpdate: String = "Last Update: ${hopkinsCSSData.updatedAt}"
-                        fragment_live_data_confirmed_cases_view_id.text = confirmedStat
-                        fragment_live_data_deaths_view_id.text = death_stat
-                        fragment_live_data_recovered_view_id.text = recovered
-                        fragment_live_data_place_view_id.text = placeName
-                        fragment_live_data_updated_view_id.text =lastUpdate
+                       setupCOVID19Stat(hopkinsCSSData, data)
                     }
                 } else {
                     Toast.makeText(context!!, "Unknown", Toast.LENGTH_SHORT).show()
@@ -314,6 +321,21 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 this@LiveDataMapView.liveDataMapViewModel.setupSearchHistory(live_data_search_view_id)
             }
         })
+    }
+
+    private fun setupCOVID19Stat(hopkinsCSSData: HopkinsCSSEDataRes, data: Stats) {
+        fragment_data_display_holder_id.visibility = View.VISIBLE
+        val confirmedStat: String = "Confirmed Cases ${data.confirmed}"
+        val deathStat: String = "Deaths ${data.deaths}"
+        val recovered: String = "Recovered ${data.recovered}"
+        val province: String? = if (hopkinsCSSData.province != null) hopkinsCSSData.province else ""
+        val placeName: String = "Location: ${hopkinsCSSData.country}, $province"
+        val lastUpdate: String = "Last Update: ${hopkinsCSSData.updatedAt}"
+        fragment_live_data_confirmed_cases_view_id.text = confirmedStat
+        fragment_live_data_deaths_view_id.text = deathStat
+        fragment_live_data_recovered_view_id.text = recovered
+        fragment_live_data_place_view_id.text = placeName
+        fragment_live_data_updated_view_id.text =lastUpdate
     }
 
     private fun moveMapCamera(lat: Double, lon: Double, zoomLevel: Float) {

@@ -61,6 +61,10 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
         TODO("Not yet implemented")
     }
 
+    override fun getItemByState(state: String): HopkinsCSSEDataRes? {
+        return this.iHopkinsDataRepo.getCSSEDataByState(state)
+    }
+
     private fun getSuggestionList(): List<HopkinsCSSEDataRes>? {
         return this.iHopkinsDataRepo.getAllData()
     }

@@ -38,4 +38,8 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     fun setupSearchHistory(liveDataSearchViewId: FloatingSearchView?) {
         //TODO
     }
+
+    fun postDataByState(state: String): HopkinsCSSEDataRes? {
+       return this.iSearchSuggestion.getItemByState(state)
+    }
 }

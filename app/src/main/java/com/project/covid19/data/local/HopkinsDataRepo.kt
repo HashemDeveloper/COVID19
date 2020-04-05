@@ -38,6 +38,20 @@ class HopkinsDataRepo @Inject constructor(): IHopkinsDataRepo, CoroutineScope {
         return getHopkinsDataBlocking()
     }
 
+    override fun getCSSEDataByState(state: String): HopkinsCSSEDataRes? {
+        return getCSSEDataByStateBlocking(state)
+    }
+    private fun getCSSEDataByStateBlocking(state: String): HopkinsCSSEDataRes? {
+        var result: HopkinsCSSEDataRes?= null
+        runBlocking {
+            val job: Deferred<HopkinsCSSEDataRes> = async { getDataByState(state)!! }
+            result = job.await()
+        }
+        return result
+    }
+    private suspend fun getDataByState(state: String): HopkinsCSSEDataRes? {
+        return this.iHopkinsDataDao.getCSSEDataByState(state)
+    }
     private fun getHopkinsDataBlocking(): List<HopkinsCSSEDataRes>? {
         var result: List<HopkinsCSSEDataRes>?= null
         runBlocking {

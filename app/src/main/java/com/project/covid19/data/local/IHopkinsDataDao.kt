@@ -11,4 +11,6 @@ interface IHopkinsDataDao {
     suspend fun getAllHopkinsData(): List<HopkinsCSSEDataRes>
     @Transaction @Query("delete from hopkins_css_data")
     suspend fun deleteHopkinsData(): Int
+    @Transaction @Query("select * from hopkins_css_data where province= :state")
+    suspend fun getCSSEDataByState(state: String): HopkinsCSSEDataRes
 }

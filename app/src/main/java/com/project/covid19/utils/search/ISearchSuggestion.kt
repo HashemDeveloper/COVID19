@@ -6,4 +6,5 @@ interface ISearchSuggestion {
     fun findSuggestions(query: String, limit: Int, listener: SearchSuggestion.SearchSuggestionListener)
     fun saveSuggestion()
     fun getHistory(): List<HopkinsCSSEDataRes>?
+    fun getItemByState(state: String): HopkinsCSSEDataRes?
 }
