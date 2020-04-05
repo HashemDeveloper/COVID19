@@ -15,6 +15,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.arlib.floatingsearchview.FloatingSearchView
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
@@ -24,6 +26,9 @@ import com.project.covid19.BuildConfig
 import com.project.covid19.R
 import com.project.covid19.di.Injectable
 import com.project.covid19.di.viewmodel.ViewModelFactory
+import com.project.covid19.model.hopkinsdata.Coordinates
+import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.utils.Constants
 import com.project.covid19.viewmodels.LiveDataMapViewModel
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_live_data_map_view.*
@@ -38,6 +43,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         this.viewModelFactory
     }
     private var googleMap: GoogleMap?= null
+    private var mLastQuery: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,8 +79,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             googleMap!!.isMyLocationEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = true
         }
-        this.googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(39.87432092, -104.3362578)))
-        this.googleMap?.animateCamera(CameraUpdateFactory.zoomTo(8f))
+        //TODO: move camera initially
         listenForCameraChange()
     }
 
@@ -216,6 +221,40 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 this.liveDataMapViewModel.findSuggestions(newQuery, live_data_search_view_id)
             }
         }
+
+        live_data_search_view_id.setOnSearchListener(object : FloatingSearchView.OnSearchListener{
+            override fun onSearchAction(currentQuery: String?) {
+                currentQuery?.let {
+                    mLastQuery = it
+                }
+                Timber.e(mLastQuery)
+            }
+
+            override fun onSuggestionClicked(searchSuggestion: SearchSuggestion?) {
+               val hopkinsCSSData: HopkinsCSSEDataRes = searchSuggestion as HopkinsCSSEDataRes
+                mLastQuery = hopkinsCSSData.body
+                Constants.hideKeyboard(activity!!)
+                val coordinates: Coordinates? = if (hopkinsCSSData.coordinates != null) hopkinsCSSData.coordinates else null
+                if (coordinates != null) {
+                    moveMapCamera(coordinates.lattitude.toDouble(), coordinates.longitude.toDouble(), 8f)
+                }
+                live_data_search_view_id.clearSearchFocus()
+            }
+        })
+        live_data_search_view_id.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
+            override fun onFocusCleared() {
+                live_data_search_view_id.setSearchBarTitle(mLastQuery)
+            }
+
+            override fun onFocus() {
+                this@LiveDataMapView.liveDataMapViewModel.setupSearchHistory(live_data_search_view_id)
+            }
+        })
+    }
+
+    private fun moveMapCamera(lat: Double, lon: Double, zoomLevel: Float) {
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lon)))
+        googleMap?.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel))
     }
 
     override fun onResume() {

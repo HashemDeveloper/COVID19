@@ -26,11 +26,16 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     }
 
     fun findSuggestions(newQuery: String, searchView: FloatingSearchView?) {
+        searchView?.showProgress()
         this.iSearchSuggestion.findSuggestions(newQuery, 5, object : SearchSuggestion.SearchSuggestionListener {
             override fun onSearchResult(result: List<HopkinsCSSEDataRes>) {
                 searchView?.swapSuggestions(result)
                 searchView?.hideProgress()
             }
         })
+    }
+
+    fun setupSearchHistory(liveDataSearchViewId: FloatingSearchView?) {
+        //TODO
     }
 }

@@ -9,11 +9,11 @@ import kotlinx.android.parcel.Parcelize
 data class Stats(
     @SerializedName("confirmed")
     @Expose
-    private var confirmed: String,
+    var confirmed: String,
     @SerializedName("deaths")
     @Expose
-    private var deaths: String,
+    var deaths: String,
     @SerializedName("recovered")
     @Expose
-    private var recovered: String
+    var recovered: String
 ): Parcelable

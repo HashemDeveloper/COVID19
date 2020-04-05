@@ -9,8 +9,8 @@ import kotlinx.android.parcel.Parcelize
 data class Coordinates(
     @SerializedName("latitude")
     @Expose
-    private var lattitude: String,
+    var lattitude: String,
     @SerializedName("longitude")
     @Expose
-    private var longitude: String
+    var longitude: String
 ): Parcelable
