@@ -7,8 +7,10 @@ import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 interface IHopkinsDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHopkinsData(list: List<HopkinsCSSEDataRes>): List<Long>
-    @Transaction @Query("select * from hopkins_css_data order by updatedAt desc limit 10")
+    @Transaction @Query("select * from hopkins_css_data order by updatedAt")
     suspend fun getAllHopkinsData(): List<HopkinsCSSEDataRes>
     @Transaction @Query("delete from hopkins_css_data")
     suspend fun deleteHopkinsData(): Int
+    @Transaction @Query("select * from hopkins_css_data where province= :state")
+    suspend fun getCSSEDataByState(state: String): HopkinsCSSEDataRes
 }

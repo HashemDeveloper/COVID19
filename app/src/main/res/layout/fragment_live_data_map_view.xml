@@ -29,13 +29,95 @@
         app:floatingSearch_hintTextColor="@color/black"
         app:floatingSearch_searchHint="Search"
         />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fragment_data_display_holder_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/bottomGuideLine"
+        app:layout_constraintStart_toStartOf="@+id/leftGuideLine"
+        app:cardUseCompatPadding="true"
+        app:barrierAllowsGoneWidgets="true"
+        app:cardCornerRadius="8dp"
+        app:contentPadding="8dp"
+        app:cardMaxElevation="8dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/black_transparent"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/black_transparent"
+            >
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragment_live_data_confirmed_cases_view_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/confirmed"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:drawableStart="@drawable/ic_confirmd"
+                android:drawablePadding="4dp"
+                android:textAlignment="center"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragment_live_data_deaths_view_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stat_of_death"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:drawableStart="@drawable/ic_deaths"
+                android:drawablePadding="4dp"
+                android:textAlignment="center"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragment_live_data_recovered_view_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stat_recovered"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:drawableStart="@drawable/recovered"
+                android:drawablePadding="4dp"
+                android:textAlignment="center"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragment_live_data_place_view_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/place_name"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                android:layout_gravity="end"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragment_live_data_updated_view_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/date"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                android:layout_gravity="end"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/fragment_live_data_credit_view_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/source_johns_hopkins"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                android:layout_gravity="end"
+                />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/leftGuideLine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.04" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/rightGuideLine"
         android:layout_width="wrap_content"
