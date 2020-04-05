@@ -1,7 +1,10 @@
 package com.project.covid19.views
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,11 +44,23 @@ import javax.inject.Inject
 class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+    private var locationManager: LocationManager?= null
+    private var isGpsEnabled = false
+    private var isNetworkEnabled = false
     private val liveDataMapViewModel: LiveDataMapViewModel by viewModels {
         this.viewModelFactory
     }
     private var googleMap: GoogleMap?= null
     private var mLastQuery: String = ""
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.locationManager = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (locationManager != null) {
+            isGpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            isNetworkEnabled = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,7 +96,33 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             googleMap!!.isMyLocationEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = true
         }
-        //TODO: move camera initially
+        var lastKnownLocation: Location?= null
+        var gpsLocation: Location? = null
+        var netLocation: Location?= null
+        if (isGpsEnabled) {
+            locationManager?.let {
+                gpsLocation = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            }
+        }
+        if (isNetworkEnabled) {
+            locationManager?.let {
+                netLocation = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            }
+        }
+        lastKnownLocation = if (gpsLocation != null && netLocation != null) {
+            if (gpsLocation?.time!! > netLocation?.time!!) {
+                gpsLocation
+            } else {
+                netLocation
+            }
+        } else if (gpsLocation != null) {
+            gpsLocation
+        } else {
+            netLocation
+        }
+        lastKnownLocation?.let {
+            moveMapCamera(it.latitude, it.longitude, 18.0f)
+        }
         listenForCameraChange()
     }
 
@@ -276,8 +317,8 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
 
     private fun moveMapCamera(lat: Double, lon: Double, zoomLevel: Float) {
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lon)))
-        googleMap?.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel))
+//        googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lon)))
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), zoomLevel))
     }
 
     override fun onResume() {
