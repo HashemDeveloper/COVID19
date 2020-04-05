@@ -9,6 +9,8 @@ import com.project.covid19.utils.networkconnections.ConnectionStateMonitor
 import com.project.covid19.utils.networkconnections.IConnectionStateMonitor
 import com.project.covid19.utils.networkconnections.IUpdateNetLowApiHelper
 import com.project.covid19.utils.networkconnections.UpdateNetLowApiHelper
+import com.project.covid19.utils.rxevents.IRxEvents
+import com.project.covid19.utils.rxevents.RxEvents
 import com.project.covid19.utils.search.ISearchSuggestion
 import com.project.covid19.utils.search.SearchSuggestion
 import dagger.Module
@@ -69,5 +71,10 @@ class ApplicationModule {
     @Provides
     fun provideNetworkLowApiHelper(updateNetLowApiHelper: UpdateNetLowApiHelper): IUpdateNetLowApiHelper {
         return updateNetLowApiHelper
+    }
+    @Singleton
+    @Provides
+    fun provideRxEventBus(rxEvents: RxEvents): IRxEvents {
+        return rxEvents
     }
 }

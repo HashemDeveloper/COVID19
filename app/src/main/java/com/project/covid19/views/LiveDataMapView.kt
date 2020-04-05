@@ -397,6 +397,10 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     override fun onResume() {
         fragment_live_data_map_view_id?.onResume()
         super.onResume()
+        setupDrawerLayout()
+    }
+    private fun setupDrawerLayout() {
+        this.liveDataMapViewModel.setupDrawerLayout(live_data_search_view_id)
     }
 
     override fun onPause() {

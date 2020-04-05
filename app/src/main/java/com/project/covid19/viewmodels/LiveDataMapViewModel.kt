@@ -5,15 +5,19 @@ import androidx.lifecycle.ViewModel
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
+import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.hopkinsdata.SearchHopkinData
 import com.project.covid19.utils.Constants
+import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.utils.search.ISearchSuggestion
 import com.project.covid19.utils.search.SearchSuggestion
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 class LiveDataMapViewModel @Inject constructor(): ViewModel() {
+    @Inject
+    lateinit var iRxEvents: IRxEvents
     @Inject
     lateinit var covid19Repo: ICovid19Repo
     @Inject
@@ -54,5 +58,9 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
         hopkinsCSSData.isHistory = true
         hopkinsCSSData.date = date
         this.iSearchSuggestion.saveSuggestion(hopkinsCSSData)
+    }
+
+    fun setupDrawerLayout(liveDataSearchViewId: FloatingSearchView?) {
+        this.iRxEvents.post(DrawerLayoutEvent(liveDataSearchViewId!!))
     }
 }
