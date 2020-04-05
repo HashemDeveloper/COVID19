@@ -37,7 +37,10 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     }
 
     fun setupSearchHistory(liveDataSearchViewId: FloatingSearchView?) {
-        //TODO
+        val searchHistory: List<SearchHopkinData>?= this.iSearchSuggestion.getHistory()
+        searchHistory?.let { list ->
+            liveDataSearchViewId?.swapSuggestions(list)
+        }
     }
 
     fun postDataByState(state: String): HopkinsCSSEDataRes? {
@@ -46,6 +49,6 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
 
     fun saveSearchHistory(hopkinsCSSData: SearchHopkinData) {
         hopkinsCSSData.isHistory = true
-
+        this.iSearchSuggestion.saveSuggestion(hopkinsCSSData)
     }
 }

@@ -59,12 +59,12 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
         }.filter(query)
     }
 
-    override fun saveSuggestion(hopkinsCSSEDataRes: HopkinsCSSEDataRes) {
-        this.iHopkinsDataRepo.saveSearchHistory(hopkinsCSSEDataRes)
+    override fun saveSuggestion(searchHistoryData: SearchHopkinData) {
+        this.iCSSESearchRepo.saveSearchHistory(searchHistoryData)
     }
 
-    override fun getHistory(): List<HopkinsCSSEDataRes>? {
-        return this.iHopkinsDataRepo.getSearchHistories()
+    override fun getHistory(): List<SearchHopkinData>? {
+       return this.iCSSESearchRepo.getSearchHistories()
     }
 
     override fun getItemByState(state: String): HopkinsCSSEDataRes? {
