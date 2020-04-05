@@ -11,6 +11,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +29,7 @@ import com.project.covid19.di.Injectable
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.hopkinsdata.Stats
 import com.project.covid19.utils.Constants
 import com.project.covid19.viewmodels.LiveDataMapViewModel
 import dagger.android.support.AndroidSupportInjection
@@ -109,6 +111,10 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     live_data_search_view_id.visibility = View.GONE
                     val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     live_data_search_view_id?.animation = fadeOutAnim
+                }
+                if (fragment_data_display_holder_id.visibility == View.VISIBLE) {
+                    val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
+                    fragment_data_display_holder_id?.animation = fadeOutAnim
                 }
             }
         }
@@ -235,8 +241,25 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 mLastQuery = hopkinsCSSData.body
                 Constants.hideKeyboard(activity!!)
                 val coordinates: Coordinates? = if (hopkinsCSSData.coordinates != null) hopkinsCSSData.coordinates else null
+                val stats: Stats? = if (hopkinsCSSData.stats != null) hopkinsCSSData.stats else null
                 if (coordinates != null) {
                     moveMapCamera(coordinates.lattitude.toDouble(), coordinates.longitude.toDouble(), 8f)
+                    fragment_data_display_holder_id.visibility = View.VISIBLE
+                    stats?.let { data ->
+                        val confirmedStat: String = "Confirmed Cases ${data.confirmed}"
+                        val death_stat: String = "Deaths ${data.deaths}"
+                        val recovered: String = "Recovered ${data.recovered}"
+                        val province: String? = if (hopkinsCSSData.province != null) hopkinsCSSData.province else ""
+                        val placeName: String = "Location: ${hopkinsCSSData.country}, $province"
+                        val lastUpdate: String = "Last Update: ${hopkinsCSSData.updatedAt}"
+                        fragment_live_data_confirmed_cases_view_id.text = confirmedStat
+                        fragment_live_data_deaths_view_id.text = death_stat
+                        fragment_live_data_recovered_view_id.text = recovered
+                        fragment_live_data_place_view_id.text = placeName
+                        fragment_live_data_updated_view_id.text =lastUpdate
+                    }
+                } else {
+                    Toast.makeText(context!!, "Unknown", Toast.LENGTH_SHORT).show()
                 }
                 live_data_search_view_id.clearSearchFocus()
             }
@@ -280,5 +303,6 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     companion object {
         private const val LOCATION_REQUEST_CODE = 34
         private const val ACCESS_COARSE_AND_FINE_LOCATION_CODE = 1
+        private const val MAP_ZOOM_LEVEL: Float = 8f
     }
 }
