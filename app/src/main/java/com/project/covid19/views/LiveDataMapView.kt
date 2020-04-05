@@ -157,6 +157,10 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 live_data_search_view_id?.animation = fadeInAnim
             }
         }
+        this.googleMap?.setOnMyLocationButtonClickListener {
+            setupCurrentLocationAndState(false)
+            true
+        }
     }
 
     private fun checkPermission() : Boolean {
