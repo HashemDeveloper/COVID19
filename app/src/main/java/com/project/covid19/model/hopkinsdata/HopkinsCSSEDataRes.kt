@@ -24,7 +24,7 @@ data class HopkinsCSSEDataRes(
     @ColumnInfo(name = "province")
     @SerializedName("province")
     @Expose
-    var province: String?,
+    var province: String?= "",
     @ColumnInfo(name = "updatedAt")
     @SerializedName("updatedAt")
     @Expose

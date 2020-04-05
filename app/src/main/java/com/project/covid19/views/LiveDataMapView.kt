@@ -14,6 +14,7 @@ import android.widget.RelativeLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
@@ -22,14 +23,21 @@ import com.google.android.gms.maps.model.LatLng
 import com.project.covid19.BuildConfig
 import com.project.covid19.R
 import com.project.covid19.di.Injectable
+import com.project.covid19.di.viewmodel.ViewModelFactory
+import com.project.covid19.viewmodels.LiveDataMapViewModel
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_live_data_map_view.*
 import timber.log.Timber
+import javax.inject.Inject
 
 
 class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val liveDataMapViewModel: LiveDataMapViewModel by viewModels {
+        this.viewModelFactory
+    }
     private var googleMap: GoogleMap?= null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,9 +60,11 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         }
 
         fragment_live_data_map_view_id.getMapAsync(this)
+        setupSearch()
         super.onViewCreated(view, savedInstanceState)
     }
 
+    //***GOOGLE MAP STARTS***
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
         if (!checkPermission()) {
@@ -194,6 +204,16 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
                     }
                 }
+            }
+        }
+    }
+    //***GOOGLE MAP ENDS***
+    private fun setupSearch() {
+        live_data_search_view_id.setOnQueryChangeListener { oldQuery, newQuery ->
+            if (oldQuery.isNotEmpty() && newQuery.isEmpty()) {
+                live_data_search_view_id.clearSuggestions()
+            } else {
+                this.liveDataMapViewModel.findSuggestions(newQuery, live_data_search_view_id)
             }
         }
     }

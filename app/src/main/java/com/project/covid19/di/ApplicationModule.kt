@@ -5,6 +5,8 @@ import com.project.covid19.Covid19App
 import com.project.covid19.data.local.*
 import com.project.covid19.data.remote.Covid19Repo
 import com.project.covid19.data.remote.ICovid19Repo
+import com.project.covid19.utils.search.ISearchSuggestion
+import com.project.covid19.utils.search.SearchSuggestion
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -38,5 +40,10 @@ class ApplicationModule {
     @Provides
     fun provideHopkinsDataRepo(hopkinsDataRepo: HopkinsDataRepo): IHopkinsDataRepo {
         return hopkinsDataRepo
+    }
+    @Singleton
+    @Provides
+    fun provideSearchSuggestion(searchSuggestion: SearchSuggestion): ISearchSuggestion {
+        return searchSuggestion
     }
 }
