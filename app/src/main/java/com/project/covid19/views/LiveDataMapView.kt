@@ -106,9 +106,22 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
 
     private fun getCurrentState(lat: Double, lon: Double): String? {
-        val geocoder: Geocoder = Geocoder(this.context!!, Locale.getDefault())
-        val addList: List<Address> = geocoder.getFromLocation(lat, lon, 1)
-        return addList[0].adminArea
+        var addList: List<Address>?= null
+        try {
+            val geocoder: Geocoder = Geocoder(this.context!!, Locale.getDefault())
+            addList= geocoder.getFromLocation(lat, lon, 1)
+        } catch (ex: Exception) {
+            if (BuildConfig.DEBUG) {
+                if (ex.localizedMessage != null) {
+                    Timber.e(ex.localizedMessage)
+                }
+            }
+        }
+        return if (addList != null && addList.isNotEmpty()) {
+            addList[0].adminArea
+        } else {
+            null
+        }
     }
 
     private fun positionMyLocationButton() {
