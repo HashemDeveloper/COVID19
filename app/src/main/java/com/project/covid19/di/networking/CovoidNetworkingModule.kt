@@ -60,10 +60,10 @@ object CovoidNetworkingModule {
         }
     }
 
-    @Singleton
+    @Provides
     @Named("base_url")
     @JvmStatic
-    internal fun provideBaseUrl(baseUrl: String): String {
+    internal fun provideBaseUrl(): String {
         return "https://corona.lmao.ninja/"
     }
 }

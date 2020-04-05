@@ -8,8 +8,8 @@ import retrofit2.http.Headers
 
 interface CovidAPI {
     @Headers("Content-Type: application/json", "User-Agent: $APP_NAME")
-    @GET("jhucsse")
-    suspend fun fetchCSSEData(): Response<HopkinsCSSEDataRes>
+    @GET("v2/jhucsse")
+    suspend fun fetchCSSEData(): Response<List<HopkinsCSSEDataRes>>
     @Headers("Content-Type: application/jsoon", "User-Agent: $APP_NAME")
     @GET("countries")
     suspend fun fetchAllCountriesData(): Response<CovidInAllCountries>
