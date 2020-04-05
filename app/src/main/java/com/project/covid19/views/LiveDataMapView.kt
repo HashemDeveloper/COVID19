@@ -395,22 +395,22 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
 
     override fun onResume() {
-        fragment_live_data_map_view_id.onResume()
+        fragment_live_data_map_view_id?.onResume()
         super.onResume()
     }
 
     override fun onPause() {
-        fragment_live_data_map_view_id.onPause()
+        fragment_live_data_map_view_id?.onPause()
         super.onPause()
     }
 
     override fun onDestroy() {
-        fragment_live_data_map_view_id.onDestroy()
+        fragment_live_data_map_view_id?.onDestroy()
         super.onDestroy()
     }
 
     override fun onLowMemory() {
-        fragment_live_data_map_view_id.onLowMemory()
+        fragment_live_data_map_view_id?.onLowMemory()
         super.onLowMemory()
     }
 

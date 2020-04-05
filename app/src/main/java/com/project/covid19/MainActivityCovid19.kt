@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.ui.setupWithNavController
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.viewmodels.LiveDataMapViewModel
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
@@ -28,6 +30,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
         setContentView(R.layout.activity_main)
         this.navController = Navigation.findNavController(this, R.id.container)
         this.navController.setGraph(R.navigation.covid19_nav_layout)
+        navigation_view_id?.setupWithNavController(this.navController)
     }
 
     override fun onStart() {
