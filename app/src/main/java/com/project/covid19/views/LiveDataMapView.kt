@@ -63,8 +63,6 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         if (!checkPermission()) {
             requestPermission()
-        } else {
-            setupCurrentLocationAndState(true)
         }
     }
 
@@ -102,7 +100,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         } else {
             googleMap!!.isMyLocationEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = true
-            setupCurrentLocationAndState(false)
+            setupCurrentLocationAndState(true)
             listenForCameraChange()
         }
     }
