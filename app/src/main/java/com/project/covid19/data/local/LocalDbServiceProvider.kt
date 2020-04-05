@@ -5,4 +5,8 @@ import javax.inject.Inject
 
 class LocalDbServiceProvider @Inject constructor(context: Context) {
     private val localDb: Covid19LocalDb = Covid19LocalDb.invoke(context)
+
+    fun getHopkinsDataDao(): IHopkinsDataDao {
+        return this.localDb.getHopkinsDataDao()
+    }
 }
