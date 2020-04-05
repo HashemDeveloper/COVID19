@@ -1,6 +1,7 @@
 package com.project.covid19.views
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Address
@@ -34,6 +35,7 @@ import com.project.covid19.di.Injectable
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.hopkinsdata.SearchHopkinData
 import com.project.covid19.model.hopkinsdata.Stats
 import com.project.covid19.utils.Constants
 import com.project.covid19.viewmodels.LiveDataMapViewModel
@@ -50,6 +52,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     private var locationManager: LocationManager?= null
     private var isGpsEnabled = false
     private var isNetworkEnabled = false
+    private var lastKnownLocation: Location?= null
     private val liveDataMapViewModel: LiveDataMapViewModel by viewModels {
         this.viewModelFactory
     }
@@ -58,10 +61,8 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.locationManager = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (locationManager != null) {
-            isGpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            isNetworkEnabled = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        if (!checkPermission()) {
+            requestPermission()
         }
     }
 
@@ -90,6 +91,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
     }
 
+
     //***GOOGLE MAP STARTS***
     override fun onMapReady(googleMap: GoogleMap?) {
         this.googleMap = googleMap
@@ -98,46 +100,11 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         } else {
             googleMap!!.isMyLocationEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = true
+            setupCurrentLocationAndState(true)
+            listenForCameraChange()
         }
-        var lastKnownLocation: Location?= null
-        var gpsLocation: Location? = null
-        var netLocation: Location?= null
-        if (isGpsEnabled) {
-            locationManager?.let {
-                gpsLocation = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            }
-        }
-        if (isNetworkEnabled) {
-            locationManager?.let {
-                netLocation = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            }
-        }
-        lastKnownLocation = if (gpsLocation != null && netLocation != null) {
-            if (gpsLocation?.time!! > netLocation?.time!!) {
-                gpsLocation
-            } else {
-                netLocation
-            }
-        } else if (gpsLocation != null) {
-            gpsLocation
-        } else {
-            netLocation
-        }
-        lastKnownLocation?.let {
-            moveMapCamera(it.latitude, it.longitude, 18.0f)
-            val state: String? = getCurrentState(it.latitude, it.longitude)
-            state?.let { s ->
-               val hopkinsCSSEDataRes: HopkinsCSSEDataRes? = this.liveDataMapViewModel.postDataByState(s)
-               hopkinsCSSEDataRes?.let { res ->
-                   val stats: Stats? = if (res.stats != null) res.stats else null
-                   stats?.let {data ->
-                       setupCOVID19Stat(res, data)
-                   }
-               }
-            }
-        }
-        listenForCameraChange()
     }
+
     private fun getCurrentState(lat: Double, lon: Double): String? {
         val geocoder: Geocoder = Geocoder(this.context!!, Locale.getDefault())
         val addList: List<Address> = geocoder.getFromLocation(lat, lon, 1)
@@ -189,6 +156,10 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
                 live_data_search_view_id?.animation = fadeInAnim
             }
+        }
+        this.googleMap?.setOnMyLocationButtonClickListener {
+            setupCurrentLocationAndState(false)
+            true
         }
     }
 
@@ -247,6 +218,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -258,6 +230,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         googleMap!!.isMyLocationEnabled = true
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
+                        setupCurrentLocationAndState(true)
                     }
                 }
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -265,6 +238,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         googleMap!!.isMyLocationEnabled = true
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
+                        setupCurrentLocationAndState(true)
                     }
                 }
             } else {
@@ -272,6 +246,53 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         googleMap!!.isMyLocationEnabled = true
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
+                        setupCurrentLocationAndState(true)
+                    }
+                }
+            }
+        }
+    }
+    @SuppressLint("MissingPermission")
+    private fun setupCurrentLocationAndState(initiateLocationManager: Boolean) {
+        this.locationManager = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (initiateLocationManager) {
+            if (locationManager != null) {
+                isGpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                isNetworkEnabled = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+            }
+        }
+        var gpsLocation: Location? = null
+        var netLocation: Location?= null
+        if (isGpsEnabled) {
+            locationManager?.let {
+                gpsLocation = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            }
+        }
+        if (isNetworkEnabled) {
+            locationManager?.let {
+                netLocation = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            }
+        }
+        lastKnownLocation = if (gpsLocation != null && netLocation != null) {
+            if (gpsLocation?.time!! > netLocation?.time!!) {
+                gpsLocation
+            } else {
+                netLocation
+            }
+        } else if (gpsLocation != null) {
+            gpsLocation
+        } else {
+            netLocation
+        }
+        lastKnownLocation?.let {
+            moveMapCamera(it.latitude, it.longitude, 18.0f)
+            val state: String? = getCurrentState(it.latitude, it.longitude)
+            state?.let { s ->
+                val hopkinsCSSEDataRes: HopkinsCSSEDataRes? = this.liveDataMapViewModel.postDataByState(s)
+                hopkinsCSSEDataRes?.let { res ->
+                    val stats: Stats? = if (res.stats != null) res.stats else null
+                    stats?.let {data ->
+                        setupInitialStat(res, data)
                     }
                 }
             }
@@ -296,7 +317,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             }
 
             override fun onSuggestionClicked(searchSuggestion: SearchSuggestion?) {
-               val hopkinsCSSData: HopkinsCSSEDataRes = searchSuggestion as HopkinsCSSEDataRes
+               val hopkinsCSSData: SearchHopkinData = searchSuggestion as SearchHopkinData
                 mLastQuery = hopkinsCSSData.body
                 Constants.hideKeyboard(activity!!)
                 val coordinates: Coordinates? = if (hopkinsCSSData.coordinates != null) hopkinsCSSData.coordinates else null
@@ -310,6 +331,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     Toast.makeText(context!!, "Unknown", Toast.LENGTH_SHORT).show()
                 }
                 live_data_search_view_id.clearSearchFocus()
+                this@LiveDataMapView.liveDataMapViewModel.saveSearchHistory(hopkinsCSSData)
             }
         })
         live_data_search_view_id.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
@@ -321,9 +343,25 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 this@LiveDataMapView.liveDataMapViewModel.setupSearchHistory(live_data_search_view_id)
             }
         })
+
     }
 
-    private fun setupCOVID19Stat(hopkinsCSSData: HopkinsCSSEDataRes, data: Stats) {
+    private fun setupCOVID19Stat(hopkinsCSSData: SearchHopkinData, data: Stats) {
+        fragment_data_display_holder_id.visibility = View.VISIBLE
+        val confirmedStat: String = "Confirmed Cases ${data.confirmed}"
+        val deathStat: String = "Deaths ${data.deaths}"
+        val recovered: String = "Recovered ${data.recovered}"
+        val province: String? = if (hopkinsCSSData.province != null) hopkinsCSSData.province else ""
+        val placeName: String = "Location: ${hopkinsCSSData.country}, $province"
+        val lastUpdate: String = "Last Update: ${hopkinsCSSData.updatedAt}"
+        fragment_live_data_confirmed_cases_view_id.text = confirmedStat
+        fragment_live_data_deaths_view_id.text = deathStat
+        fragment_live_data_recovered_view_id.text = recovered
+        fragment_live_data_place_view_id.text = placeName
+        fragment_live_data_updated_view_id.text =lastUpdate
+    }
+
+    private fun setupInitialStat(hopkinsCSSData: HopkinsCSSEDataRes, data: Stats) {
         fragment_data_display_holder_id.visibility = View.VISIBLE
         val confirmedStat: String = "Confirmed Cases ${data.confirmed}"
         val deathStat: String = "Deaths ${data.deaths}"

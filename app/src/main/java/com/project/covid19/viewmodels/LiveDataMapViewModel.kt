@@ -6,8 +6,11 @@ import com.arlib.floatingsearchview.FloatingSearchView
 import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.hopkinsdata.SearchHopkinData
+import com.project.covid19.utils.Constants
 import com.project.covid19.utils.search.ISearchSuggestion
 import com.project.covid19.utils.search.SearchSuggestion
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 class LiveDataMapViewModel @Inject constructor(): ViewModel() {
@@ -28,7 +31,7 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     fun findSuggestions(newQuery: String, searchView: FloatingSearchView?) {
         searchView?.showProgress()
         this.iSearchSuggestion.findSuggestions(newQuery, 5, object : SearchSuggestion.SearchSuggestionListener {
-            override fun onSearchResult(result: List<HopkinsCSSEDataRes>) {
+            override fun onSearchResult(result: List<SearchHopkinData>) {
                 searchView?.swapSuggestions(result)
                 searchView?.hideProgress()
             }
@@ -36,10 +39,20 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     }
 
     fun setupSearchHistory(liveDataSearchViewId: FloatingSearchView?) {
-        //TODO
+        val searchHistory: List<SearchHopkinData>?= this.iSearchSuggestion.getHistory()
+        searchHistory?.let { list ->
+            liveDataSearchViewId?.swapSuggestions(list)
+        }
     }
 
     fun postDataByState(state: String): HopkinsCSSEDataRes? {
        return this.iSearchSuggestion.getItemByState(state)
+    }
+
+    fun saveSearchHistory(hopkinsCSSData: SearchHopkinData) {
+        val date: OffsetDateTime = Constants.getCurrentTime()
+        hopkinsCSSData.isHistory = true
+        hopkinsCSSData.date = date
+        this.iSearchSuggestion.saveSuggestion(hopkinsCSSData)
     }
 }

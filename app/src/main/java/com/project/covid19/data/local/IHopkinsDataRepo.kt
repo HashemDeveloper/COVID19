@@ -6,5 +6,7 @@ interface IHopkinsDataRepo {
     fun insert(list: List<HopkinsCSSEDataRes>)
     fun getAllData(): List<HopkinsCSSEDataRes>?
     fun getCSSEDataByState(state: String): HopkinsCSSEDataRes?
+    fun saveSearchHistory(hopkinsCSSEDataRes: HopkinsCSSEDataRes)
+    fun getSearchHistories(): List<HopkinsCSSEDataRes>?
     fun deleteAll()
 }

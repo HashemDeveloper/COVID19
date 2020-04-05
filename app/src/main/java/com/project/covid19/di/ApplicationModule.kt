@@ -34,12 +34,22 @@ class ApplicationModule {
     fun provideHopkinsDataDao(dbProvider: LocalDbServiceProvider): IHopkinsDataDao {
         return dbProvider.getHopkinsDataDao()
     }
+    @Singleton
+    @Provides
+    fun provideCSSESearchHistoryDao(dbProvider: LocalDbServiceProvider): ICsseSearchDao {
+        return dbProvider.getCSSESearchHistoryDao()
+    }
 
     //Local data
     @Singleton
     @Provides
     fun provideHopkinsDataRepo(hopkinsDataRepo: HopkinsDataRepo): IHopkinsDataRepo {
         return hopkinsDataRepo
+    }
+    @Singleton
+    @Provides
+    fun provideCSSESearchRepo(csseSearchRepo: CSSESearchRepo): ICSSESearchRepo {
+        return csseSearchRepo
     }
     @Singleton
     @Provides
