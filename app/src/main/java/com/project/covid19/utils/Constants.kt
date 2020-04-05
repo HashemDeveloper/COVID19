@@ -14,6 +14,8 @@ import java.util.*
 
 class Constants {
     companion object {
+        const val CONNECTIVITY_ACTION: String = "android.net.conn.CONNECTIVITY_CHANGE"
+
         fun hideKeyboard(activity: FragmentActivity?) {
             val imm: InputMethodManager? = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm?.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)

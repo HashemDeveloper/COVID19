@@ -9,4 +9,9 @@
     <string name="date">Date</string>
     <string name="source_johns_hopkins">Source: Johns Hopkins</string>
     <string name="place_name">Place name</string>
+    <string name="not_connected_internet">No Internet Connection</string>
+    <string name="settings">Settings</string>
+    <string name="using_wifi">Using Wi-Fi</string>
+    <string name="using_mobile_data">Using Mobile Data</string>
+    <string name="unauthorized_internet_connection">Unauthorized Internet Connection</string>
 </resources>

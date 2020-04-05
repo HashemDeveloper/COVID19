@@ -1,6 +1,7 @@
 package com.project.covid19.di
 
 import com.project.covid19.Covid19App
+import com.project.covid19.di.networking.BroadcastModule
 import com.project.covid19.di.networking.RetrofitModule
 import com.project.covid19.di.service.ServiceModule
 import com.project.covid19.di.viewmodel.ViewModelModule
@@ -11,7 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [AndroidSupportInjectionModule::class, ApplicationModule::class,
-    ActivityModule::class, ViewModelModule::class, ServiceModule::class, RetrofitModule::class])
+    ActivityModule::class, ViewModelModule::class, ServiceModule::class, RetrofitModule::class, BroadcastModule::class])
 interface ApplicationComponent {
     @Component.Builder
     interface Builder {

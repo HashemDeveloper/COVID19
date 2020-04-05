@@ -5,6 +5,10 @@ import com.project.covid19.Covid19App
 import com.project.covid19.data.local.*
 import com.project.covid19.data.remote.Covid19Repo
 import com.project.covid19.data.remote.ICovid19Repo
+import com.project.covid19.utils.networkconnections.ConnectionStateMonitor
+import com.project.covid19.utils.networkconnections.IConnectionStateMonitor
+import com.project.covid19.utils.networkconnections.IUpdateNetLowApiHelper
+import com.project.covid19.utils.networkconnections.UpdateNetLowApiHelper
 import com.project.covid19.utils.search.ISearchSuggestion
 import com.project.covid19.utils.search.SearchSuggestion
 import dagger.Module
@@ -55,5 +59,15 @@ class ApplicationModule {
     @Provides
     fun provideSearchSuggestion(searchSuggestion: SearchSuggestion): ISearchSuggestion {
         return searchSuggestion
+    }
+    @Singleton
+    @Provides
+    fun provideConnectionStateMonitor(connectionStateMonitor: ConnectionStateMonitor): IConnectionStateMonitor {
+        return connectionStateMonitor
+    }
+    @Singleton
+    @Provides
+    fun provideNetworkLowApiHelper(updateNetLowApiHelper: UpdateNetLowApiHelper): IUpdateNetLowApiHelper {
+        return updateNetLowApiHelper
     }
 }
