@@ -13,4 +13,8 @@ interface IHopkinsDataDao {
     suspend fun deleteHopkinsData(): Int
     @Transaction @Query("select * from hopkins_css_data where province= :state")
     suspend fun getCSSEDataByState(state: String): HopkinsCSSEDataRes
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveSuggestion(hopkinsCSSEDataRes: HopkinsCSSEDataRes): Long
+    @Transaction @Query("select * from hopkins_css_data order by updatedAt desc limit 5")
+    suspend fun getSuggestions(): List<HopkinsCSSEDataRes>
 }

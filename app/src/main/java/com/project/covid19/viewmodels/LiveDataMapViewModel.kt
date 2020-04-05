@@ -6,6 +6,7 @@ import com.arlib.floatingsearchview.FloatingSearchView
 import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.hopkinsdata.SearchHopkinData
 import com.project.covid19.utils.search.ISearchSuggestion
 import com.project.covid19.utils.search.SearchSuggestion
 import javax.inject.Inject
@@ -28,7 +29,7 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     fun findSuggestions(newQuery: String, searchView: FloatingSearchView?) {
         searchView?.showProgress()
         this.iSearchSuggestion.findSuggestions(newQuery, 5, object : SearchSuggestion.SearchSuggestionListener {
-            override fun onSearchResult(result: List<HopkinsCSSEDataRes>) {
+            override fun onSearchResult(result: List<SearchHopkinData>) {
                 searchView?.swapSuggestions(result)
                 searchView?.hideProgress()
             }
@@ -41,5 +42,10 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
 
     fun postDataByState(state: String): HopkinsCSSEDataRes? {
        return this.iSearchSuggestion.getItemByState(state)
+    }
+
+    fun saveSearchHistory(hopkinsCSSData: SearchHopkinData) {
+        hopkinsCSSData.isHistory = true
+
     }
 }

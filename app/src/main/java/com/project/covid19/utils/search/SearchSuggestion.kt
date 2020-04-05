@@ -1,8 +1,10 @@
 package com.project.covid19.utils.search
 
 import android.widget.Filter
+import com.project.covid19.data.local.CSSESearchRepo
 import com.project.covid19.data.local.IHopkinsDataRepo
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.hopkinsdata.SearchHopkinData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -11,13 +13,15 @@ import kotlin.coroutines.CoroutineContext
 
 class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
     @Inject
+    lateinit var iCSSESearchRepo: CSSESearchRepo
+    @Inject
     lateinit var iHopkinsDataRepo: IHopkinsDataRepo
     private val job = Job()
 
     override fun findSuggestions(query: String, limit: Int, listener: SearchSuggestionListener) {
         object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val suggestionList: MutableList<HopkinsCSSEDataRes> = arrayListOf()
+                val suggestionList: MutableList<SearchHopkinData> = arrayListOf()
                 if (!(constraint == null || constraint.isEmpty())) {
                     getSuggestionList()?.let {list ->
                         for (hopkinsData: HopkinsCSSEDataRes in list) {
@@ -25,7 +29,9 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
                             val country: String = if (hopkinsData.country != null) hopkinsData.country!! else ""
                             if ((country.startsWith(constraint.toString(), true))
                                 || state.startsWith(constraint.toString(), true)) {
-                                suggestionList.add(hopkinsData)
+                                val searchData: SearchHopkinData = SearchHopkinData(hopkinsData.id,country,
+                                state, hopkinsData.updatedAt, hopkinsData.stats, hopkinsData.coordinates, hopkinsData.isHistory)
+                                suggestionList.add(searchData)
                                 if (limit != -1 && suggestionList.size == limit) {
                                     break
                                 }
@@ -46,19 +52,19 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
             override fun publishResults(constraint: CharSequence?, result: FilterResults?) {
                 result?.let { filterResults: FilterResults ->
                     if (filterResults.values != null) {
-                        listener.onSearchResult(filterResults.values as MutableList<HopkinsCSSEDataRes>)
+                        listener.onSearchResult(filterResults.values as MutableList<SearchHopkinData>)
                     }
                 }
             }
         }.filter(query)
     }
 
-    override fun saveSuggestion() {
-        TODO("Not yet implemented")
+    override fun saveSuggestion(hopkinsCSSEDataRes: HopkinsCSSEDataRes) {
+        this.iHopkinsDataRepo.saveSearchHistory(hopkinsCSSEDataRes)
     }
 
     override fun getHistory(): List<HopkinsCSSEDataRes>? {
-        TODO("Not yet implemented")
+        return this.iHopkinsDataRepo.getSearchHistories()
     }
 
     override fun getItemByState(state: String): HopkinsCSSEDataRes? {
@@ -73,6 +79,6 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
         get() = this.job + Dispatchers.IO
 
     interface SearchSuggestionListener {
-        fun onSearchResult(result: List<HopkinsCSSEDataRes>)
+        fun onSearchResult(result: List<SearchHopkinData>)
     }
 }

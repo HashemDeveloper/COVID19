@@ -9,4 +9,7 @@ class LocalDbServiceProvider @Inject constructor(context: Context) {
     fun getHopkinsDataDao(): IHopkinsDataDao {
         return this.localDb.getHopkinsDataDao()
     }
+    fun getCSSESearchHistoryDao(): ICsseSearchDao {
+        return this.localDb.getHopkingDataSearchHistoryDao()
+    }
 }

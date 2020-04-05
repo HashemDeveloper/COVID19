@@ -80,6 +80,37 @@ class HopkinsDataRepo @Inject constructor(): IHopkinsDataRepo, CoroutineScope {
         }
     }
 
+    override fun saveSearchHistory(hopkinsCSSEDataRes: HopkinsCSSEDataRes) {
+        launch {
+            val save: Flow<Long>? = storeSearchHistory(hopkinsCSSEDataRes)
+            save?.collect { id ->
+               if (BuildConfig.DEBUG) {
+                   Timber.d("Save success with id $id")
+               }
+            }
+        }
+    }
+
+    override fun getSearchHistories(): List<HopkinsCSSEDataRes>? {
+        return searchHistoryBlocking()
+    }
+    private fun searchHistoryBlocking(): List<HopkinsCSSEDataRes>? {
+        var result: List<HopkinsCSSEDataRes>?= null
+        runBlocking {
+            val job: Deferred<List<HopkinsCSSEDataRes>> = async { retrieveAllData()!! }
+            result = job.await()
+        }
+        return result
+    }
+    private suspend fun searchHistoryFromDAO(): List<HopkinsCSSEDataRes>? {
+        return this.iHopkinsDataDao.getSuggestions()
+    }
+
+    private fun storeSearchHistory(hopkinsCSSEDataRes: HopkinsCSSEDataRes): Flow<Long> = flow {
+        val value: Long = iHopkinsDataDao.saveSuggestion(hopkinsCSSEDataRes)
+        emit(value)
+    }
+
     private fun deleteAllData(): Flow<Int> = flow {
         val value: Int = iHopkinsDataDao.deleteHopkinsData()
         emit(value)

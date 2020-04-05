@@ -6,13 +6,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.hopkinsdata.SearchHopkinData
 import com.project.covid19.utils.typeconvert.CoordinateConverter
 import com.project.covid19.utils.typeconvert.StatConverter
 
-@Database(entities = [HopkinsCSSEDataRes::class], version = 1, exportSchema = false)
+@Database(entities = [HopkinsCSSEDataRes::class, SearchHopkinData::class], version = 1, exportSchema = false)
 @TypeConverters(StatConverter::class, CoordinateConverter::class)
 abstract class Covid19LocalDb: RoomDatabase() {
     abstract fun getHopkinsDataDao(): IHopkinsDataDao
+    abstract fun getHopkingDataSearchHistoryDao(): ICsseSearchDao
 
     companion object {
         private const val DB_NAME = "COVID19_DB"
