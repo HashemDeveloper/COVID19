@@ -6,13 +6,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.project.covid19.data.local.ISharedPref
+import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
+import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
+import com.project.covid19.utils.Constants
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.viewmodels.LiveDataMapViewModel
 import com.project.covid19.views.recycler.DrawerItemAdapter
@@ -25,6 +29,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
@@ -57,6 +62,26 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
         this.liveDataMapViewModel.fetchAndSaveData()
         setupNavigationDrawer()
         monitorThemeState()
+        testNewsData()
+    }
+
+    private fun testNewsData() {
+        this.liveDataMapViewModel.getCOVID19NewsLiveData(Constants.COVID_NEWS_API_END_POINT + "US")?.observe(this, Observer {
+            when (it.status) {
+                DataHandler.Status.LOADING -> {
+
+                }
+                DataHandler.Status.SUCCESS -> {
+                    if (it.data is COVIDSmartTableAIRes) {
+                        val newsData: COVIDSmartTableAIRes = it.data as COVIDSmartTableAIRes
+                        Timber.d("Data: ${newsData.updatedDateTime}")
+                    }
+                }
+                DataHandler.Status.ERROR -> {
+
+                }
+            }
+        })
     }
 
     private fun setupNavigationDrawer() {

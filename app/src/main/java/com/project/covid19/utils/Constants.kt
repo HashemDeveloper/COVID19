@@ -16,6 +16,7 @@ class Constants {
     companion object {
         const val IS_NIGHT_MODE: String = "is_night_mode_on"
         const val CONNECTIVITY_ACTION: String = "android.net.conn.CONNECTIVITY_CHANGE"
+        const val COVID_NEWS_API_END_POINT = "https://api.smartable.ai/coronavirus/news/"
 
         fun hideKeyboard(activity: FragmentActivity?) {
             val imm: InputMethodManager? = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.project.covid19.BuildConfig
 import com.project.covid19.data.local.IHopkinsDataRepo
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
+import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
 import com.project.covid19.utils.extensions.covidLiveDataExt
 import com.project.covid19.utils.extensions.fetchAndSaveData
 import kotlinx.coroutines.*
@@ -73,6 +74,31 @@ class Covid19Repo @Inject constructor(): ICovid19Repo, BaseDataSource(), Corouti
     private suspend fun callFetchCSSEDataApi(): DataHandler<List<HopkinsCSSEDataRes>>? {
         return getResult {
             this.api.fetchCSSEData()
+        }
+    }
+
+    override fun getCOVID19News(location: String): LiveData<DataHandler<COVIDSmartTableAIRes>>? {
+        return covidLiveDataExt {
+            getCovid19News(location)!!
+        }
+    }
+    private fun getCovid19News(location: String): DataHandler<COVIDSmartTableAIRes>? {
+        return fetchCOVID19NewsBlocking(location)
+    }
+    private fun fetchCOVID19NewsBlocking(location: String): DataHandler<COVIDSmartTableAIRes>? {
+        var result: DataHandler<COVIDSmartTableAIRes>?= null
+        runBlocking {
+            if (callSmartableCOVIDNewsAPI(location) != null) {
+                val job: Deferred<DataHandler<COVIDSmartTableAIRes>> = async { callSmartableCOVIDNewsAPI(location)!! }
+                result = job.await()
+            }
+        }
+        return result
+    }
+
+    private suspend fun callSmartableCOVIDNewsAPI(location: String): DataHandler<COVIDSmartTableAIRes>? {
+        return getResult {
+            this.api.getNewsOfCOVID19(location)
         }
     }
 

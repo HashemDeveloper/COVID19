@@ -14,6 +14,7 @@ import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.hopkinsdata.SearchHopkinData
+import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
 import com.project.covid19.utils.Constants
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.utils.search.ISearchSuggestion
@@ -31,6 +32,7 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     @Inject
     lateinit var iSearchSuggestion: ISearchSuggestion
     private var cssDataLiveData: LiveData<DataHandler<List<HopkinsCSSEDataRes>>>?= null
+    private var covid19NewsData: LiveData<DataHandler<COVIDSmartTableAIRes>>?= null
 
     fun getCssDataLiveData(): LiveData<DataHandler<List<HopkinsCSSEDataRes>>>? {
         this.cssDataLiveData = this.covid19Repo.getCSSELiveData()
@@ -39,6 +41,12 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     fun fetchAndSaveData() {
         this.covid19Repo.fetchAndSaveCSSEData()
     }
+
+    fun getCOVID19NewsLiveData(location: String): LiveData<DataHandler<COVIDSmartTableAIRes>>? {
+        this.covid19NewsData = this.covid19Repo.getCOVID19News(location)
+        return this.covid19NewsData
+    }
+
 
     fun findSuggestions(newQuery: String, searchView: FloatingSearchView?) {
         searchView?.showProgress()
