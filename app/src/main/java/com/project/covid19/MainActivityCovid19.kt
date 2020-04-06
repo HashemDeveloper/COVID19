@@ -1,5 +1,6 @@
 package com.project.covid19
 
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -21,6 +22,7 @@ import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.viewmodels.LiveDataMapViewModel
 import com.project.covid19.views.recycler.DrawerItemAdapter
 import com.project.covid19.views.recycler.items.DrawerHeaderItems
+import com.project.covid19.views.recycler.items.DrawerNewsItemHeader
 import com.project.covid19.views.recycler.items.DrawerNewsItems
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -32,7 +34,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
+class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, SharedPreferences.OnSharedPreferenceChangeListener{
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     @Inject
     lateinit var iSharedPref: ISharedPref
@@ -96,17 +98,25 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
 
     private fun setupDrawerItems() {
         navigation_view_menu_item_view_id?.layoutManager = LinearLayoutManager(this)
-        this.drawerItemAdapter = DrawerItemAdapter()
+        this.drawerItemAdapter = DrawerItemAdapter(applicationContext)
+        val isNightMode: Boolean = this.iSharedPref.getIsNightModeOn()
+        this.drawerItemAdapter?.setIsNightMode(isNightMode)
         navigation_view_menu_item_view_id?.adapter = drawerItemAdapter
         val drawerHeaderItems = DrawerHeaderItems("")
-        val topNews = DrawerNewsItems("Top News")
+        val newsHeader = DrawerNewsItemHeader("News")
+        val localNews = DrawerNewsItems("Local")
+        val globalNews = DrawerNewsItems("Global")
         val list: MutableList<Any> = arrayListOf()
         list.add(drawerHeaderItems)
-        list.add(topNews)
+        list.add(newsHeader)
+        list.add(localNews)
+        list.add(globalNews)
+
         this.drawerItemAdapter?.setData(list)
     }
 
     private fun monitorThemeState() {
+        this.iSharedPref.registerOnSharedPrefListener(this)
         val configuration: Configuration? = resources.configuration
         configuration?.let {config ->
             when (config.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
@@ -128,5 +138,21 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onSharedPreferenceChanged(pref: SharedPreferences?, key: String?) {
+        when (key) {
+            Constants.IS_NIGHT_MODE -> {
+                val isNightMode: Boolean = pref?.getBoolean(Constants.IS_NIGHT_MODE, false)!!
+                if (this.drawerItemAdapter != null) {
+                    this.drawerItemAdapter?.setIsNightMode(isNightMode)
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        this.iSharedPref.unregisterOnSharedPrefListener(this)
     }
 }

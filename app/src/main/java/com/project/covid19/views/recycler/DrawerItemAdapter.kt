@@ -1,17 +1,25 @@
 package com.project.covid19.views.recycler
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textview.MaterialTextView
 import com.project.covid19.R
+import com.project.covid19.data.local.ISharedPref
 import com.project.covid19.views.recycler.items.DrawerHeaderItems
+import com.project.covid19.views.recycler.items.DrawerNewsItemHeader
 import com.project.covid19.views.recycler.items.DrawerNewsItems
 
-class DrawerItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
+class DrawerItemAdapter constructor(private var context: Context): RecyclerView.Adapter<BaseViewHolder<*>>() {
     private var data: MutableList<Any> = arrayListOf()
+    private var isNightMode: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when(viewType) {
@@ -19,9 +27,13 @@ class DrawerItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
                 val headerView: View = LayoutInflater.from(parent.context).inflate(R.layout.drawer_header_item_layout, parent, false)
                 DrawerHeaderViewHolder((headerView))
             }
+            NAV_NEWS_ITEM_HEADER -> {
+                val newsItemHeaderView: View = LayoutInflater.from(parent.context).inflate(R.layout.drawer_news_item_header_layout, parent, false)
+                DrawerNewsItemHeaderHolder(newsItemHeaderView, this.context,  getIsNightMode())
+            }
             NAV_NEWS_ITEMS -> {
-                val newsItemView: View = LayoutInflater.from(parent.context).inflate(R.layout.drawer_news_item_layout, parent, false)
-                DrawerNewsItemHolder(newsItemView)
+                val newsItemsView: View = LayoutInflater.from(parent.context).inflate(R.layout.drawer_news_items_layout, parent, false)
+                DrawerNewsItemsHolder(newsItemsView, this.context, getIsNightMode())
             }
             else -> throw IllegalArgumentException("Unsupported view")
         }
@@ -35,13 +47,15 @@ class DrawerItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
         val items: Any = this.data[position]
         when (holder) {
             is DrawerHeaderViewHolder -> holder.bindView(items as DrawerHeaderItems)
-            is DrawerNewsItemHolder -> holder.bindView(items as DrawerNewsItems)
+            is DrawerNewsItemHeaderHolder -> holder.bindView(items as DrawerNewsItemHeader)
+            is DrawerNewsItemsHolder -> holder.bindView(items as DrawerNewsItems)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (this.data[position]) {
             is DrawerHeaderItems -> NAV_HEADER
+            is DrawerNewsItemHeader -> NAV_NEWS_ITEM_HEADER
             is DrawerNewsItems -> NAV_NEWS_ITEMS
             else -> throw IllegalArgumentException("Invalid index position $position")
         }
@@ -50,6 +64,12 @@ class DrawerItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
         this.data.clear()
         this.data.addAll(dataList)
         notifyDataSetChanged()
+    }
+    fun setIsNightMode(isNightMode: Boolean) {
+        this.isNightMode = isNightMode
+    }
+    fun getIsNightMode(): Boolean {
+        return this.isNightMode
     }
 
     inner class DrawerHeaderViewHolder(private var view: View): BaseViewHolder<DrawerHeaderItems>(view) {
@@ -69,23 +89,48 @@ class DrawerItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
             }
         }
     }
-    inner class DrawerNewsItemHolder(private var view: View): BaseViewHolder<DrawerNewsItems>(view) {
-        private var newsItemTitleView: AppCompatTextView?= null
+    inner class DrawerNewsItemHeaderHolder(private var view: View, private var context: Context, private var isNightMode: Boolean): BaseViewHolder<DrawerNewsItemHeader>(view) {
+        private var newsItemHeaderTitle: AppCompatTextView?= null
         init {
-            this.newsItemTitleView = this.view.findViewById(R.id.drawer_news_item_title_view_id)
+            this.newsItemHeaderTitle = this.view.findViewById(R.id.drawer_news_item_header_title_view_id)
+            if (this.isNightMode) {
+                this.newsItemHeaderTitle?.setTextColor(ContextCompat.getColor(this.context, R.color.white))
+            } else {
+                this.newsItemHeaderTitle?.setTextColor(ContextCompat.getColor(this.context, R.color.blue_gray400))
+            }
         }
 
-        override fun bindView(item: DrawerNewsItems) {
+        override fun bindView(item: DrawerNewsItemHeader) {
             item.let {newsItems ->
-                this.newsItemTitleView?.let { textView ->
+                this.newsItemHeaderTitle?.let { textView ->
                     textView.text = newsItems.itemName
+                }
+            }
+        }
+    }
+    inner class DrawerNewsItemsHolder(private var view: View, private var context: Context, private var isNightMode: Boolean): BaseViewHolder<DrawerNewsItems>(view) {
+        private var newsItemTitleView: MaterialTextView?= null
+
+        init {
+            this.newsItemTitleView = this.view.findViewById(R.id.drawer_news_items_view_id)
+            if (this.isNightMode) {
+                this.newsItemTitleView?.setTextColor(ContextCompat.getColor(this.context, R.color.white))
+            } else {
+                this.newsItemTitleView?.setTextColor(ContextCompat.getColor(this.context, R.color.blue_gray400))
+            }
+        }
+        override fun bindView(item: DrawerNewsItems) {
+            item.let { items ->
+                this.newsItemTitleView?.let { textView ->
+                    textView.text = items.newsItemName
                 }
             }
         }
     }
     companion object {
         private const val NAV_HEADER: Int = 0
-        private const val NAV_NEWS_ITEMS: Int = 1
-        private const val NAV_FOOTER: Int = 2
+        private const val NAV_NEWS_ITEM_HEADER = 1
+        private const val NAV_NEWS_ITEMS: Int = 2
+        private const val NAV_FOOTER: Int = 3
     }
 }
