@@ -34,6 +34,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         this.navController = Navigation.findNavController(this, R.id.container)

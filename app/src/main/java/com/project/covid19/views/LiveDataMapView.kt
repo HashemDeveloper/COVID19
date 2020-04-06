@@ -299,7 +299,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             netLocation
         }
         lastKnownLocation?.let {
-            moveMapCamera(it.latitude, it.longitude, 18.0f)
+            moveMapCamera(it.latitude, it.longitude, 8.0f)
             val state: String? = getCurrentState(it.latitude, it.longitude)
             state?.let { s ->
                 val hopkinsCSSEDataRes: HopkinsCSSEDataRes? = this.liveDataMapViewModel.postDataByState(s)
