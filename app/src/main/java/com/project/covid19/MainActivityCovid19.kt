@@ -1,12 +1,15 @@
 package com.project.covid19
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
+import com.project.covid19.data.local.ISharedPref
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.utils.rxevents.IRxEvents
@@ -22,6 +25,8 @@ import javax.inject.Inject
 
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    @Inject
+    lateinit var iSharedPref: ISharedPref
     @Inject
     lateinit var iRxEvents: IRxEvents
     @Inject
@@ -46,6 +51,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
         super.onStart()
         this.liveDataMapViewModel.fetchAndSaveData()
         setupNavigationDrawer()
+        monitorThemeState()
     }
 
     private fun setupNavigationDrawer() {
@@ -56,7 +62,27 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
                 event?.floatingSearchView?.attachNavigationDrawerToMenuButton(navigation_drawer_layout_id)
             })
     }
+    private fun monitorThemeState() {
+        val configuration: Configuration? = resources.configuration
+        configuration?.let {config ->
+            when (config.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_NO -> {
+                    this.iSharedPref.setIsNightModeOn(false)
+                }
+                Configuration.UI_MODE_NIGHT_YES -> {
+                    this.iSharedPref.setIsNightModeOn(true)
+                }
+            }
+        }
+    }
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return this.dispatchFragmentInjector
+    }
+    override fun onBackPressed() {
+        if (navigation_drawer_layout_id.isDrawerOpen(GravityCompat.START)) {
+            navigation_drawer_layout_id.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 }

@@ -14,6 +14,7 @@ import java.util.*
 
 class Constants {
     companion object {
+        const val IS_NIGHT_MODE: String = "is_night_mode_on"
         const val CONNECTIVITY_ACTION: String = "android.net.conn.CONNECTIVITY_CHANGE"
 
         fun hideKeyboard(activity: FragmentActivity?) {

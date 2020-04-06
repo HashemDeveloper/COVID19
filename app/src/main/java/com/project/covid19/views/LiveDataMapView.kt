@@ -100,9 +100,13 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         } else {
             googleMap!!.isMyLocationEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = true
-            this.liveDataMapViewModel.drawVisualData(googleMap)
             setupCurrentLocationAndState(true)
             listenForCameraChange()
+            activity?.let {
+                if (!it.isDestroyed) {
+                    this.liveDataMapViewModel.drawVisualData(googleMap)
+                }
+            }
         }
     }
 
@@ -152,7 +156,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     live_data_search_view_id?.animation = fadeOutAnim
                 }
-                if (fragment_data_display_holder_id.visibility == View.VISIBLE) {
+                if (fragment_data_display_holder_id != null && fragment_data_display_holder_id.visibility == View.VISIBLE) {
                     val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     fragment_data_display_holder_id?.animation = fadeOutAnim
                 }
@@ -178,11 +182,17 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
 
     private fun checkPermission() : Boolean {
-        val foreGroundFineLocationState: Int = ContextCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_FINE_LOCATION)
-        val foreGroundCoarseLocationState: Int = ContextCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_COARSE_LOCATION)
+        var foreGroundFineLocationState: Int = 0
+        var foreGroundCoarseLocationState: Int = 0
+        this.context?.let { ctx ->
+            foreGroundFineLocationState = ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
+            foreGroundCoarseLocationState = ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
         var backgroundLocationState = 0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            backgroundLocationState = ContextCompat.checkSelfPermission(this.context!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            this.context?.let {
+                backgroundLocationState = ContextCompat.checkSelfPermission(it, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
         }
         return (foreGroundCoarseLocationState == PackageManager.PERMISSION_GRANTED) && (foreGroundFineLocationState == PackageManager.PERMISSION_GRANTED)
                 && (backgroundLocationState == PackageManager.PERMISSION_GRANTED)
@@ -268,7 +278,9 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
     @SuppressLint("MissingPermission")
     private fun setupCurrentLocationAndState(initiateLocationManager: Boolean) {
-        this.locationManager = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        this.context?.let {
+            this.locationManager = this.context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        }
         if (initiateLocationManager) {
             if (locationManager != null) {
                 isGpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -376,18 +388,18 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
 
     private fun setupInitialStat(hopkinsCSSData: HopkinsCSSEDataRes, data: Stats) {
-        fragment_data_display_holder_id.visibility = View.VISIBLE
+        fragment_data_display_holder_id?.visibility = View.VISIBLE
         val confirmedStat: String = "Confirmed Cases ${data.confirmed}"
         val deathStat: String = "Deaths ${data.deaths}"
         val recovered: String = "Recovered ${data.recovered}"
         val province: String? = if (hopkinsCSSData.province != null) hopkinsCSSData.province else ""
         val placeName: String = "Location: ${hopkinsCSSData.country}, $province"
         val lastUpdate: String = "Last Update: ${hopkinsCSSData.updatedAt}"
-        fragment_live_data_confirmed_cases_view_id.text = confirmedStat
-        fragment_live_data_deaths_view_id.text = deathStat
-        fragment_live_data_recovered_view_id.text = recovered
-        fragment_live_data_place_view_id.text = placeName
-        fragment_live_data_updated_view_id.text =lastUpdate
+        fragment_live_data_confirmed_cases_view_id?.text = confirmedStat
+        fragment_live_data_deaths_view_id?.text = deathStat
+        fragment_live_data_recovered_view_id?.text = recovered
+        fragment_live_data_place_view_id?.text = placeName
+        fragment_live_data_updated_view_id?.text =lastUpdate
     }
 
     private fun moveMapCamera(lat: Double, lon: Double, zoomLevel: Float) {
