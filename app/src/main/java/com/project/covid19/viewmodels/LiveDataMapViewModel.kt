@@ -22,7 +22,8 @@ import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 class LiveDataMapViewModel @Inject constructor(): ViewModel() {
-    private var circle: Circle?= null
+    private var confirmedCircle: Circle?= null
+    private var deathStatCircle: Circle?= null
     @Inject
     lateinit var iRxEvents: IRxEvents
     @Inject
@@ -81,18 +82,29 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
                         if (ltln.lattitude.isNotEmpty() && ltln.longitude.isNotEmpty()) {
                             val latLong: LatLng = LatLng(ltln.lattitude.toDouble(), ltln.longitude.toDouble())
                             var confirmedRD: Double = 0.0
+                            var deathRD: Double = 0.0
                             data.stats?.let { stats ->
                                 if (stats.confirmed.isNotEmpty()) {
                                     confirmedRD = stats.confirmed.toDouble()
                                 }
+                                if (stats.deaths.isNotEmpty()) {
+                                    deathRD = stats.deaths.toDouble()
+                                }
                             }
-                            this.circle = googleMap.addCircle(
+                            this.confirmedCircle = googleMap.addCircle(
                                 CircleOptions()
                                     .center(latLong)
                                     .radius(confirmedRD)
                                     .strokeWidth(2.0f)
                                     .strokeColor(Color.RED)
                                     .fillColor(Color.argb(128, 255, 0, 0)))
+                            this.deathStatCircle = googleMap.addCircle(
+                                CircleOptions()
+                                .center(latLong)
+                                .radius(deathRD)
+                                .strokeWidth(2.0f)
+                                .strokeColor(Color.RED)
+                                .fillColor(Color.argb(128, 255, 0, 100)))
                         }
                     }
                 }
