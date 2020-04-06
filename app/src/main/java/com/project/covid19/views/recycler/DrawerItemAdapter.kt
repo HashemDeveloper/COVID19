@@ -1,8 +1,6 @@
 package com.project.covid19.views.recycler
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +10,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.project.covid19.R
-import com.project.covid19.data.local.ISharedPref
 import com.project.covid19.views.recycler.items.DrawerHeaderItems
 import com.project.covid19.views.recycler.items.DrawerNewsItemHeader
 import com.project.covid19.views.recycler.items.DrawerNewsItems
 
-class DrawerItemAdapter constructor(private var context: Context): RecyclerView.Adapter<BaseViewHolder<*>>() {
+class DrawerItemAdapter constructor(private var context: Context, private var listenerNews: OnNewsItemClickListener): RecyclerView.Adapter<BaseViewHolder<*>>() {
     private var data: MutableList<Any> = arrayListOf()
     private var isNightMode: Boolean = false
 
@@ -33,7 +30,14 @@ class DrawerItemAdapter constructor(private var context: Context): RecyclerView.
             }
             NAV_NEWS_ITEMS -> {
                 val newsItemsView: View = LayoutInflater.from(parent.context).inflate(R.layout.drawer_news_items_layout, parent, false)
-                DrawerNewsItemsHolder(newsItemsView, this.context, getIsNightMode())
+                val newsItemsHolder: DrawerNewsItemsHolder = DrawerNewsItemsHolder(newsItemsView, this.context, getIsNightMode())
+                newsItemsHolder.getNewsItemTitleView()?.let { textView ->
+                    textView.setOnClickListener {
+                        val drawerNewsItems: DrawerNewsItems = newsItemsHolder.itemView.tag as DrawerNewsItems
+                        this.listenerNews.onItemClicked(drawerNewsItems)
+                    }
+                }
+                newsItemsHolder
             }
             else -> throw IllegalArgumentException("Unsupported view")
         }
@@ -68,7 +72,8 @@ class DrawerItemAdapter constructor(private var context: Context): RecyclerView.
     fun setIsNightMode(isNightMode: Boolean) {
         this.isNightMode = isNightMode
     }
-    fun getIsNightMode(): Boolean {
+
+    private fun getIsNightMode(): Boolean {
         return this.isNightMode
     }
 
@@ -120,13 +125,21 @@ class DrawerItemAdapter constructor(private var context: Context): RecyclerView.
             }
         }
         override fun bindView(item: DrawerNewsItems) {
+            itemView.tag = item
             item.let { items ->
                 this.newsItemTitleView?.let { textView ->
                     textView.text = items.newsItemName
                 }
             }
         }
+        fun getNewsItemTitleView(): MaterialTextView? {
+            return this.newsItemTitleView
+        }
     }
+    interface OnNewsItemClickListener {
+        fun <T> onItemClicked(item: T)
+    }
+
     companion object {
         private const val NAV_HEADER: Int = 0
         private const val NAV_NEWS_ITEM_HEADER = 1

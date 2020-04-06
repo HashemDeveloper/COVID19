@@ -34,21 +34,26 @@ import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, SharedPreferences.OnSharedPreferenceChangeListener{
+class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
+    SharedPreferences.OnSharedPreferenceChangeListener, DrawerItemAdapter.OnNewsItemClickListener {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+
     @Inject
     lateinit var iSharedPref: ISharedPref
+
     @Inject
     lateinit var iRxEvents: IRxEvents
+
     @Inject
     lateinit var viewModeLFactory: ViewModelFactory
     private val liveDataMapViewModel: LiveDataMapViewModel by viewModels {
         this.viewModeLFactory
     }
+
     @Inject
     lateinit var dispatchFragmentInjector: DispatchingAndroidInjector<Fragment>
     private lateinit var navController: NavController
-    private var drawerItemAdapter: DrawerItemAdapter?= null
+    private var drawerItemAdapter: DrawerItemAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -68,22 +73,23 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, Sha
     }
 
     private fun testNewsData() {
-        this.liveDataMapViewModel.getCOVID19NewsLiveData(Constants.COVID_NEWS_API_END_POINT + "US")?.observe(this, Observer {
-            when (it.status) {
-                DataHandler.Status.LOADING -> {
+        this.liveDataMapViewModel.getCOVID19NewsLiveData(Constants.COVID_NEWS_API_END_POINT + "US")
+            ?.observe(this, Observer {
+                when (it.status) {
+                    DataHandler.Status.LOADING -> {
 
-                }
-                DataHandler.Status.SUCCESS -> {
-                    if (it.data is COVIDSmartTableAIRes) {
-                        val newsData: COVIDSmartTableAIRes = it.data as COVIDSmartTableAIRes
-                        Timber.d("Data: ${newsData.updatedDateTime}")
+                    }
+                    DataHandler.Status.SUCCESS -> {
+                        if (it.data is COVIDSmartTableAIRes) {
+                            val newsData: COVIDSmartTableAIRes = it.data as COVIDSmartTableAIRes
+                            Timber.d("Data: ${newsData.updatedDateTime}")
+                        }
+                    }
+                    DataHandler.Status.ERROR -> {
+
                     }
                 }
-                DataHandler.Status.ERROR -> {
-
-                }
-            }
-        })
+            })
     }
 
     private fun setupNavigationDrawer() {
@@ -91,14 +97,16 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, Sha
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { event ->
-                event?.floatingSearchView?.attachNavigationDrawerToMenuButton(navigation_drawer_layout_id)
+                event?.floatingSearchView?.attachNavigationDrawerToMenuButton(
+                    navigation_drawer_layout_id
+                )
                 setupDrawerItems()
             })
     }
 
     private fun setupDrawerItems() {
         navigation_view_menu_item_view_id?.layoutManager = LinearLayoutManager(this)
-        this.drawerItemAdapter = DrawerItemAdapter(applicationContext)
+        this.drawerItemAdapter = DrawerItemAdapter(applicationContext, this)
         val isNightMode: Boolean = this.iSharedPref.getIsNightModeOn()
         this.drawerItemAdapter?.setIsNightMode(isNightMode)
         navigation_view_menu_item_view_id?.adapter = drawerItemAdapter
@@ -118,7 +126,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, Sha
     private fun monitorThemeState() {
         this.iSharedPref.registerOnSharedPrefListener(this)
         val configuration: Configuration? = resources.configuration
-        configuration?.let {config ->
+        configuration?.let { config ->
             when (config.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_NO -> {
                     this.iSharedPref.setIsNightModeOn(false)
@@ -129,9 +137,11 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, Sha
             }
         }
     }
+
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return this.dispatchFragmentInjector
     }
+
     override fun onBackPressed() {
         if (navigation_drawer_layout_id.isDrawerOpen(GravityCompat.START)) {
             navigation_drawer_layout_id.closeDrawer(GravityCompat.START)
@@ -146,6 +156,22 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector, Sha
                 val isNightMode: Boolean = pref?.getBoolean(Constants.IS_NIGHT_MODE, false)!!
                 if (this.drawerItemAdapter != null) {
                     this.drawerItemAdapter?.setIsNightMode(isNightMode)
+                }
+            }
+        }
+    }
+
+    override fun <T> onItemClicked(item: T) {
+        when (item) {
+            is DrawerNewsItems -> {
+                val newsItem: DrawerNewsItems = item
+                when (newsItem.newsItemName) {
+                    "Local" -> {
+                        Timber.d("Local")
+                    }
+                    "Global" -> {
+                        Timber.d("Global")
+                    }
                 }
             }
         }
