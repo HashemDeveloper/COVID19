@@ -8,4 +8,5 @@ interface ISearchSuggestion {
     fun saveSuggestion(searchHistory: SearchHopkinData)
     fun getHistory(): List<SearchHopkinData>?
     fun getItemByState(state: String): HopkinsCSSEDataRes?
+    fun getAllHopkingsCSSEData(): List<HopkinsCSSEDataRes>?
 }

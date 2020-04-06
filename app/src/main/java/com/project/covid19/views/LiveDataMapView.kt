@@ -100,6 +100,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         } else {
             googleMap!!.isMyLocationEnabled = true
             googleMap.uiSettings.isMyLocationButtonEnabled = true
+            this.liveDataMapViewModel.drawVisualData(googleMap)
             setupCurrentLocationAndState(true)
             listenForCameraChange()
         }
