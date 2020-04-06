@@ -14,6 +14,7 @@ import java.util.*
 
 class Constants {
     companion object {
+        const val BUNDLE_NEWS_URL: String = "bundle_news_url"
         const val IS_NIGHT_MODE: String = "is_night_mode_on"
         const val CONNECTIVITY_ACTION: String = "android.net.conn.CONNECTIVITY_CHANGE"
         const val COVID_NEWS_API_END_POINT = "https://api.smartable.ai/coronavirus/news/"

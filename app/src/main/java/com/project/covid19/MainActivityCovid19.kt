@@ -32,6 +32,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
@@ -167,14 +168,25 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
                 val newsItem: DrawerNewsItems = item
                 when (newsItem.newsItemName) {
                     "Local" -> {
-                        Timber.d("Local")
+                        val local: String = Locale.getDefault().country
+                        val newsUrl: String = Constants.COVID_NEWS_API_END_POINT + "/$local"
+                        navigateTowNewsPage(newsUrl)
                     }
                     "Global" -> {
-                        Timber.d("Global")
+                        val newsUrl: String = Constants.COVID_NEWS_API_END_POINT + "/GB"
+                        navigateTowNewsPage(newsUrl)
                     }
                 }
             }
         }
+    }
+    private fun navigateTowNewsPage(url: String) {
+        if (navigation_drawer_layout_id.isDrawerOpen(GravityCompat.START)) {
+            navigation_drawer_layout_id.closeDrawer(GravityCompat.START)
+        }
+        val bundle = Bundle()
+        bundle.putString(Constants.BUNDLE_NEWS_URL, url)
+        this.navController.navigate(R.id.newsView_id, bundle)
     }
 
     override fun onDestroy() {
