@@ -1,6 +1,7 @@
 package com.project.covid19.data.local
 
 import com.project.covid19.BuildConfig
+import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -96,6 +97,26 @@ class HopkinsDataRepo @Inject constructor(): IHopkinsDataRepo, CoroutineScope {
     override fun getSearchHistories(): List<HopkinsCSSEDataRes>? {
         return searchHistoryBlocking()
     }
+
+    override fun getCSSEDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {
+        return this.getDataByCoordBlocking(coordinates)
+    }
+
+    private fun getDataByCoordBlocking(coordinates: Coordinates): HopkinsCSSEDataRes? {
+        var result: HopkinsCSSEDataRes?= null
+        runBlocking {
+            if (getDataByCoord(coordinates) != null) {
+                val job: Deferred<HopkinsCSSEDataRes> = async { getDataByCoord(coordinates)!! }
+                result = job.await()
+            }
+        }
+        return result
+    }
+
+    private suspend fun getDataByCoord(coordinates: Coordinates): HopkinsCSSEDataRes? {
+        return this.iHopkinsDataDao.getCSSEDataByCoordinates(coordinates)
+    }
+
     private fun searchHistoryBlocking(): List<HopkinsCSSEDataRes>? {
         var result: List<HopkinsCSSEDataRes>?= null
         runBlocking {

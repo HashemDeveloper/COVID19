@@ -1,5 +1,6 @@
 package com.project.covid19.data.local
 
+import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 
 interface IHopkinsDataRepo {
@@ -9,4 +10,5 @@ interface IHopkinsDataRepo {
     fun saveSearchHistory(hopkinsCSSEDataRes: HopkinsCSSEDataRes)
     fun getSearchHistories(): List<HopkinsCSSEDataRes>?
     fun deleteAll()
+    fun getCSSEDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes?
 }

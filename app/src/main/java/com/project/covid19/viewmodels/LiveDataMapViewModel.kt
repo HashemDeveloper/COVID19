@@ -97,18 +97,25 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
                                     .radius(confirmedRD)
                                     .strokeWidth(2.0f)
                                     .strokeColor(Color.RED)
-                                    .fillColor(Color.argb(128, 255, 0, 0)))
+                                    .fillColor(Color.argb(128, 255, 0, 0))
+                                    .clickable(true))
                             this.deathStatCircle = googleMap.addCircle(
                                 CircleOptions()
-                                .center(latLong)
-                                .radius(deathRD)
-                                .strokeWidth(2.0f)
-                                .strokeColor(Color.RED)
-                                .fillColor(Color.argb(128, 255, 0, 100)))
+                                    .center(latLong)
+                                    .radius(deathRD)
+                                    .strokeWidth(2.0f)
+                                    .strokeColor(Color.RED)
+                                    .fillColor(Color.argb(128, 255, 0, 100))
+                                    .clickable(true))
+
                         }
                     }
                 }
             }
         }
+    }
+
+    fun getDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {
+        return this.iSearchSuggestion.getHopkingsDataByCoordinates(coordinates)
     }
 }

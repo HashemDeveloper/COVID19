@@ -3,6 +3,7 @@ package com.project.covid19.utils.search
 import android.widget.Filter
 import com.project.covid19.data.local.CSSESearchRepo
 import com.project.covid19.data.local.IHopkinsDataRepo
+import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.hopkinsdata.SearchHopkinData
 import kotlinx.coroutines.CoroutineScope
@@ -73,6 +74,10 @@ class SearchSuggestion @Inject constructor(): ISearchSuggestion, CoroutineScope{
 
     override fun getAllHopkingsCSSEData(): List<HopkinsCSSEDataRes>? {
         return getSuggestionList()
+    }
+
+    override fun getHopkingsDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {
+        return this.iHopkinsDataRepo.getCSSEDataByCoordinates(coordinates)
     }
 
     private fun getSuggestionList(): List<HopkinsCSSEDataRes>? {

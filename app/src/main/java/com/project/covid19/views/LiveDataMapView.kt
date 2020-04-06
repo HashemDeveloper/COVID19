@@ -179,6 +179,20 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             setupCurrentLocationAndState(false)
             true
         }
+        this.googleMap?.setOnCircleClickListener { circle ->
+            val center: LatLng? = circle?.center
+            val coordinates: Coordinates = Coordinates(center?.latitude.toString(), center?.longitude.toString())
+            val hopkinsCSSEDataRes: HopkinsCSSEDataRes? =this.liveDataMapViewModel.getDataByCoordinates(coordinates)
+            hopkinsCSSEDataRes?.let { data ->
+                val stats: Stats? = data.stats
+                stats?.let { s ->
+                    setupInitialStat(data, s)
+                    center?.let { ltln ->
+                        moveMapCamera(ltln.latitude, ltln.longitude, 8.0f)
+                    }
+                }
+            }
+        }
     }
 
     private fun checkPermission() : Boolean {

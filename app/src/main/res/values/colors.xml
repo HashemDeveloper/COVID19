@@ -6,4 +6,5 @@
 
     <color name="black_transparent">#570C0B0B</color>
     <color name="red_900">#B71C1C</color>
+    <color name="blue_gray400">#78909C</color>
 </resources>
