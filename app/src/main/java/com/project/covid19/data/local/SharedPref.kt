@@ -2,7 +2,9 @@ package com.project.covid19.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import com.project.covid19.utils.Constants
 import javax.inject.Inject
 
 class SharedPref @Inject constructor(): ISharedPref {
@@ -22,5 +24,15 @@ class SharedPref @Inject constructor(): ISharedPref {
             this.pref = PreferenceManager.getDefaultSharedPreferences(context)
             return SharedPref()
         }
+    }
+
+    override fun setIsNightModeOn(isNightModeOn: Boolean) {
+        pref?.edit(commit = true) {
+            putBoolean(Constants.IS_NIGHT_MODE, isNightModeOn)
+        }
+    }
+
+    override fun getIsNightModeOn(): Boolean {
+        return pref?.getBoolean(Constants.IS_NIGHT_MODE, false)!!
     }
 }

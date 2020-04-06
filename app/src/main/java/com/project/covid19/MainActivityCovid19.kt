@@ -1,16 +1,23 @@
 package com.project.covid19
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.project.covid19.data.local.ISharedPref
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.viewmodels.LiveDataMapViewModel
+import com.project.covid19.views.recycler.DrawerItemAdapter
+import com.project.covid19.views.recycler.items.DrawerHeaderItems
+import com.project.covid19.views.recycler.items.DrawerNewsItems
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
@@ -23,6 +30,8 @@ import javax.inject.Inject
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     @Inject
+    lateinit var iSharedPref: ISharedPref
+    @Inject
     lateinit var iRxEvents: IRxEvents
     @Inject
     lateinit var viewModeLFactory: ViewModelFactory
@@ -32,8 +41,10 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
     @Inject
     lateinit var dispatchFragmentInjector: DispatchingAndroidInjector<Fragment>
     private lateinit var navController: NavController
+    private var drawerItemAdapter: DrawerItemAdapter?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         this.navController = Navigation.findNavController(this, R.id.container)
@@ -45,6 +56,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
         super.onStart()
         this.liveDataMapViewModel.fetchAndSaveData()
         setupNavigationDrawer()
+        monitorThemeState()
     }
 
     private fun setupNavigationDrawer() {
@@ -53,9 +65,43 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { event ->
                 event?.floatingSearchView?.attachNavigationDrawerToMenuButton(navigation_drawer_layout_id)
+                setupDrawerItems()
             })
+    }
+
+    private fun setupDrawerItems() {
+        navigation_view_menu_item_view_id?.layoutManager = LinearLayoutManager(this)
+        this.drawerItemAdapter = DrawerItemAdapter()
+        navigation_view_menu_item_view_id?.adapter = drawerItemAdapter
+        val drawerHeaderItems = DrawerHeaderItems("")
+        val topNews = DrawerNewsItems("Top News")
+        val list: MutableList<Any> = arrayListOf()
+        list.add(drawerHeaderItems)
+        list.add(topNews)
+        this.drawerItemAdapter?.setData(list)
+    }
+
+    private fun monitorThemeState() {
+        val configuration: Configuration? = resources.configuration
+        configuration?.let {config ->
+            when (config.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_NO -> {
+                    this.iSharedPref.setIsNightModeOn(false)
+                }
+                Configuration.UI_MODE_NIGHT_YES -> {
+                    this.iSharedPref.setIsNightModeOn(true)
+                }
+            }
+        }
     }
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return this.dispatchFragmentInjector
+    }
+    override fun onBackPressed() {
+        if (navigation_drawer_layout_id.isDrawerOpen(GravityCompat.START)) {
+            navigation_drawer_layout_id.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 }

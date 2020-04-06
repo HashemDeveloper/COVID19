@@ -5,6 +5,7 @@ import android.app.Service
 import com.facebook.stetho.Stetho
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.project.covid19.di.ApplicationInjector
+import com.project.covid19.utils.theme.ThemeHelper
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -25,6 +26,7 @@ class Covid19App: Application(), HasAndroidInjector, HasServiceInjector {
             Timber.plant(Timber.DebugTree())
         }
         ApplicationInjector.init(this)
+        ThemeHelper.applyTheme(ThemeHelper.DEFAULT_MODE)
         AndroidThreeTen.init(this)
     }
 

@@ -14,4 +14,5 @@
     <string name="using_wifi">Using Wi-Fi</string>
     <string name="using_mobile_data">Using Mobile Data</string>
     <string name="unauthorized_internet_connection">Unauthorized Internet Connection</string>
+    <string name="news_items">News Items</string>
 </resources>
