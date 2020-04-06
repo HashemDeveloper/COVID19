@@ -9,11 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.project.covid19.data.local.ISharedPref
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.viewmodels.LiveDataMapViewModel
+import com.project.covid19.views.recycler.DrawerItemAdapter
+import com.project.covid19.views.recycler.items.DrawerHeaderItems
+import com.project.covid19.views.recycler.items.DrawerNewsItems
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
@@ -37,6 +41,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
     @Inject
     lateinit var dispatchFragmentInjector: DispatchingAndroidInjector<Fragment>
     private lateinit var navController: NavController
+    private var drawerItemAdapter: DrawerItemAdapter?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -60,8 +65,22 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { event ->
                 event?.floatingSearchView?.attachNavigationDrawerToMenuButton(navigation_drawer_layout_id)
+                setupDrawerItems()
             })
     }
+
+    private fun setupDrawerItems() {
+        navigation_view_menu_item_view_id?.layoutManager = LinearLayoutManager(this)
+        this.drawerItemAdapter = DrawerItemAdapter()
+        navigation_view_menu_item_view_id?.adapter = drawerItemAdapter
+        val drawerHeaderItems = DrawerHeaderItems("")
+        val topNews = DrawerNewsItems("Top News")
+        val list: MutableList<Any> = arrayListOf()
+        list.add(drawerHeaderItems)
+        list.add(topNews)
+        this.drawerItemAdapter?.setData(list)
+    }
+
     private fun monitorThemeState() {
         val configuration: Configuration? = resources.configuration
         configuration?.let {config ->

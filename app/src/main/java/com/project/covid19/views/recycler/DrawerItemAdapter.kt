@@ -63,7 +63,7 @@ class DrawerItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
                     if (it.backgroundImage.isNotEmpty()) {
                         //Display image of top headings
                     } else {
-                        bgImageView.setImageResource(R.drawable.image_friendly_message_small)
+                        bgImageView.setImageResource(R.drawable.covid_message_image_medium)
                     }
                 }
             }

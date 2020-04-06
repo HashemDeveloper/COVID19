@@ -151,12 +151,12 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                     val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     getMapLocationBt()?.animation = fadeOutAnim
                 }
-                if (live_data_search_view_id.visibility == View.VISIBLE) {
-                    live_data_search_view_id.visibility = View.GONE
+                if (live_data_search_view_id?.visibility == View.VISIBLE) {
+                    live_data_search_view_id?.visibility = View.GONE
                     val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     live_data_search_view_id?.animation = fadeOutAnim
                 }
-                if (fragment_data_display_holder_id != null && fragment_data_display_holder_id.visibility == View.VISIBLE) {
+                if (fragment_data_display_holder_id != null && fragment_data_display_holder_id?.visibility == View.VISIBLE) {
                     val fadeOutAnim = AnimationUtils.loadAnimation(context, R.anim.anim_fade_out)
                     fragment_data_display_holder_id?.animation = fadeOutAnim
                 }
@@ -169,8 +169,8 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
                 getMapLocationBt()?.animation = fadeInAnim
             }
-            if (live_data_search_view_id.visibility == View.GONE) {
-                live_data_search_view_id.visibility = View.VISIBLE
+            if (live_data_search_view_id?.visibility == View.GONE) {
+                live_data_search_view_id?.visibility = View.VISIBLE
                 val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
                 live_data_search_view_id?.animation = fadeInAnim
             }
@@ -326,7 +326,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
     }
     //***GOOGLE MAP ENDS***
     private fun setupSearch() {
-        live_data_search_view_id.setOnQueryChangeListener { oldQuery, newQuery ->
+        live_data_search_view_id?.setOnQueryChangeListener { oldQuery, newQuery ->
             if (oldQuery.isNotEmpty() && newQuery.isEmpty()) {
                 live_data_search_view_id.clearSuggestions()
             } else {
@@ -334,7 +334,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             }
         }
 
-        live_data_search_view_id.setOnSearchListener(object : FloatingSearchView.OnSearchListener{
+        live_data_search_view_id?.setOnSearchListener(object : FloatingSearchView.OnSearchListener{
             override fun onSearchAction(currentQuery: String?) {
                 currentQuery?.let {
                     mLastQuery = it
@@ -356,13 +356,13 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                 } else {
                     Toast.makeText(context!!, "Unknown", Toast.LENGTH_SHORT).show()
                 }
-                live_data_search_view_id.clearSearchFocus()
+                live_data_search_view_id?.clearSearchFocus()
                 this@LiveDataMapView.liveDataMapViewModel.saveSearchHistory(hopkinsCSSData)
             }
         })
         live_data_search_view_id.setOnFocusChangeListener(object : FloatingSearchView.OnFocusChangeListener {
             override fun onFocusCleared() {
-                live_data_search_view_id.setSearchBarTitle(mLastQuery)
+                live_data_search_view_id?.setSearchBarTitle(mLastQuery)
             }
 
             override fun onFocus() {
