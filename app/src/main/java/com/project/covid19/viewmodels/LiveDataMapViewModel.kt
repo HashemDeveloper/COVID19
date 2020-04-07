@@ -1,5 +1,6 @@
 package com.project.covid19.viewmodels
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.project.covid19.data.local.SharedPref
 import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
 import com.project.covid19.events.DrawerLayoutEvent
@@ -25,6 +27,8 @@ import javax.inject.Inject
 class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     private var confirmedCircle: Circle?= null
     private var deathStatCircle: Circle?= null
+    @Inject
+    lateinit var iSharedPref: SharedPref
     @Inject
     lateinit var iRxEvents: IRxEvents
     @Inject
@@ -118,7 +122,12 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
             }
         }
     }
-
+    fun getIsNightModeOn(): Boolean {
+        return this.iSharedPref.getIsNightModeOn()
+    }
+    fun setupSharedPrefChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        this.iSharedPref.registerOnSharedPrefListener(listener)
+    }
 
     fun getDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {
         return this.iSearchSuggestion.getHopkingsDataByCoordinates(coordinates)

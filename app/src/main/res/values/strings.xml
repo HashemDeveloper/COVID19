@@ -15,4 +15,7 @@
     <string name="using_mobile_data">Using Mobile Data</string>
     <string name="unauthorized_internet_connection">Unauthorized Internet Connection</string>
     <string name="news_items">News Items</string>
+    <string name="news_provider_title">News Provider Title</string>
+    <string name="news_title">News Title</string>
+    <string name="short_excerpt">Short Excerpt</string>
 </resources>
