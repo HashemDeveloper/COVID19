@@ -15,14 +15,25 @@ import com.project.covid19.R
 import com.project.covid19.model.smartableai.COVIDNews
 import com.project.covid19.model.smartableai.Images
 import com.project.covid19.utils.glide.GlideApp
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.*
 
-class NewsItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
+class NewsItemAdapter (private var listener: NewsItemClickListener): RecyclerView.Adapter<BaseViewHolder<*>>() {
     private val newsData: MutableList<COVIDNews> = arrayListOf()
     private var isNightMode: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         val view: View = LayoutInflater.from(parent.context).inflate(R.layout.fragment_news_item_layout, parent, false)
-        return NewsItemHolder(view, parent.context, getIsNightMode())
+        val newsItemHolder: NewsItemHolder = NewsItemHolder(view, parent.context, getIsNightMode())
+        newsItemHolder.getNewsItemHolder()?.let { holder ->
+            holder.setOnClickListener {
+                val newsItems: COVIDNews = newsItemHolder.itemView.tag as COVIDNews
+                this.listener.onNewsItemClicked(newsItems)
+            }
+        }
+        return newsItemHolder
     }
 
     override fun getItemCount(): Int {
@@ -74,22 +85,22 @@ class NewsItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
             itemView.tag = item
             var provider: String?= ""
             val newsTitle: String = item.title
-            val newsExcerpt: String = item.excerpt
+            var newsExcerpt: String = item.excerpt
+            if (newsExcerpt.length > 200) {
+                newsExcerpt = newsExcerpt.substring(0, 200) + "..."
+            }
+            var publishedTime: String = item.publishedDateTime
+            publishedTime = publishedTime.replace("T", " ")
+            val time: String = getTime(publishedTime)
+            val date: String = getDate(publishedTime)
 
             val imageList: List<Images>?= item.images
             var newsImage: String = ""
-            var width: Int = 0
-            var height: Int = 0
+
             imageList?.let {listOfImages ->
                 for (images in listOfImages) {
                     images.url?.let { url ->
                         newsImage = url
-                    }
-                    images.width?.let { w ->
-                        width = w
-                    }
-                    images.height?.let { h ->
-                        height = h
                     }
                 }
             }
@@ -97,21 +108,25 @@ class NewsItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
             item.provider?.let {
                 provider = it.name
             }
-
+            val providerAndPublishTime = "$provider  $date $time"
             this.providerNameView?.let { providerView ->
-                providerView.text = provider
+                providerView.text = providerAndPublishTime
             }
             val circularProgressDrawable = CircularProgressDrawable(this.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
             circularProgressDrawable.setColorSchemeColors(Color.GRAY)
             circularProgressDrawable.start()
-            this.newsImageViewView?.let { imageView ->
-                GlideApp.with(this.context).load(newsImage)
-                    .placeholder(circularProgressDrawable)
-                    .override(width!!, height!!)
-                    .into(imageView)
+            try {
+                this.newsImageViewView?.let { imageView ->
+                    GlideApp.with(this.view).load(newsImage)
+                        .placeholder(circularProgressDrawable)
+                        .into(imageView)
+                }
+            } catch (ex: Exception) {
+
             }
+
             this.newsTitleView?.let { titleView ->
                 titleView.text = newsTitle
             }
@@ -119,5 +134,30 @@ class NewsItemAdapter: RecyclerView.Adapter<BaseViewHolder<*>>() {
                 excerptView.text = newsExcerpt
             }
         }
+        fun getNewsItemHolder(): MaterialCardView? {
+            return this.holderCardView
+        }
+    }
+    private fun getTime(time: String): String {
+        val date: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(time)!!
+        return SimpleDateFormat("hh:mm aa", Locale.getDefault()).format(date)
+    }
+    private fun getDate(time: String): String {
+        val date: Date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(time)!!
+        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
+    }
+
+    private fun timeInMilli(time: String): Long {
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
+        )
+
+        return OffsetDateTime.parse(time, formatter)
+            .toInstant()
+            .toEpochMilli()
+    }
+
+    interface NewsItemClickListener {
+        fun onNewsItemClicked(newsItem: COVIDNews)
     }
 }
