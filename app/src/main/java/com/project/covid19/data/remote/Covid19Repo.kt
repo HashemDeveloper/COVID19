@@ -7,7 +7,10 @@ import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
 import com.project.covid19.utils.extensions.covidLiveDataExt
 import com.project.covid19.utils.extensions.fetchAndSaveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -38,7 +41,7 @@ class Covid19Repo @Inject constructor(): ICovid19Repo, BaseDataSource(), Corouti
 
     override fun getCSSELiveData(): LiveData<DataHandler<List<HopkinsCSSEDataRes>>>? {
         return covidLiveDataExt {
-            fetchCSSEData()!!
+            callFetchCSSEDataApi()!!
         }
     }
 
@@ -58,47 +61,21 @@ class Covid19Repo @Inject constructor(): ICovid19Repo, BaseDataSource(), Corouti
         }
     }
 
-    private fun fetchCSSEData(): DataHandler<List<HopkinsCSSEDataRes>>? {
-        return fetchCSSEDataBlocking()
-    }
-    private fun fetchCSSEDataBlocking(): DataHandler<List<HopkinsCSSEDataRes>>? {
-        var result: DataHandler<List<HopkinsCSSEDataRes>>?= null
-        runBlocking {
-            if (callFetchCSSEDataApi() != null) {
-                val blockingJob: Deferred<DataHandler<List<HopkinsCSSEDataRes>>> = async { callFetchCSSEDataApi()!! }
-                result = blockingJob.await()
-            }
-        }
-        return result
-    }
     private suspend fun callFetchCSSEDataApi(): DataHandler<List<HopkinsCSSEDataRes>>? {
         return getResult {
             this.api.fetchCSSEData()
         }
     }
 
-    override fun getCOVID19News(location: String): LiveData<DataHandler<COVIDSmartTableAIRes>>? {
+    override fun getCOVID19News(url: String): LiveData<DataHandler<COVIDSmartTableAIRes>>? {
         return covidLiveDataExt {
-            getCovid19News(location)!!
+            callSmartableCOVIDNewsAPI(url)!!
         }
-    }
-    private fun getCovid19News(location: String): DataHandler<COVIDSmartTableAIRes>? {
-        return fetchCOVID19NewsBlocking(location)
-    }
-    private fun fetchCOVID19NewsBlocking(location: String): DataHandler<COVIDSmartTableAIRes>? {
-        var result: DataHandler<COVIDSmartTableAIRes>?= null
-        runBlocking {
-            if (callSmartableCOVIDNewsAPI(location) != null) {
-                val job: Deferred<DataHandler<COVIDSmartTableAIRes>> = async { callSmartableCOVIDNewsAPI(location)!! }
-                result = job.await()
-            }
-        }
-        return result
     }
 
-    private suspend fun callSmartableCOVIDNewsAPI(location: String): DataHandler<COVIDSmartTableAIRes>? {
+    private suspend fun callSmartableCOVIDNewsAPI(url: String): DataHandler<COVIDSmartTableAIRes>? {
         return getResult {
-            this.api.getNewsOfCOVID19(location)
+            this.api.getNewsOfCOVID19(url)
         }
     }
 

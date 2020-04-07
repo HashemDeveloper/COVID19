@@ -34,10 +34,6 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     private var cssDataLiveData: LiveData<DataHandler<List<HopkinsCSSEDataRes>>>?= null
     private var covid19NewsData: LiveData<DataHandler<COVIDSmartTableAIRes>>?= null
 
-    fun getCssDataLiveData(): LiveData<DataHandler<List<HopkinsCSSEDataRes>>>? {
-        this.cssDataLiveData = this.covid19Repo.getCSSELiveData()
-        return cssDataLiveData
-    }
     fun fetchAndSaveData() {
         this.covid19Repo.fetchAndSaveCSSEData()
     }
@@ -122,6 +118,7 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
             }
         }
     }
+
 
     fun getDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {
         return this.iSearchSuggestion.getHopkingsDataByCoordinates(coordinates)

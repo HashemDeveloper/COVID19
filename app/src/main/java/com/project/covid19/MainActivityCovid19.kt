@@ -7,16 +7,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.project.covid19.data.local.ISharedPref
-import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
-import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
 import com.project.covid19.utils.Constants
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.viewmodels.LiveDataMapViewModel
@@ -31,14 +28,21 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
-    SharedPreferences.OnSharedPreferenceChangeListener, DrawerItemAdapter.OnNewsItemClickListener {
+    SharedPreferences.OnSharedPreferenceChangeListener, DrawerItemAdapter.OnNewsItemClickListener, CoroutineScope {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-
+    private val job = Job()
     @Inject
     lateinit var iSharedPref: ISharedPref
 
@@ -70,27 +74,6 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
         this.liveDataMapViewModel.fetchAndSaveData()
         setupNavigationDrawer()
         monitorThemeState()
-        testNewsData()
-    }
-
-    private fun testNewsData() {
-        this.liveDataMapViewModel.getCOVID19NewsLiveData(Constants.COVID_NEWS_API_END_POINT + "US")
-            ?.observe(this, Observer {
-                when (it.status) {
-                    DataHandler.Status.LOADING -> {
-
-                    }
-                    DataHandler.Status.SUCCESS -> {
-                        if (it.data is COVIDSmartTableAIRes) {
-                            val newsData: COVIDSmartTableAIRes = it.data as COVIDSmartTableAIRes
-                            Timber.d("Data: ${newsData.updatedDateTime}")
-                        }
-                    }
-                    DataHandler.Status.ERROR -> {
-
-                    }
-                }
-            })
     }
 
     private fun setupNavigationDrawer() {
@@ -181,16 +164,32 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
         }
     }
     private fun navigateTowNewsPage(url: String) {
+        launch {
+            val checkIfClosed: Flow<Boolean> = isNavBarDrawerClosed()
+            checkIfClosed.collect { isClosed ->
+                if (isClosed) {
+                    val bundle = Bundle()
+                    bundle.putString(Constants.BUNDLE_NEWS_URL, url)
+                    navController.navigate(R.id.newsView_id, bundle)
+                    viewModelStore.clear()
+                }
+            }
+        }
+    }
+    private fun isNavBarDrawerClosed(): Flow<Boolean> = flow {
+        var isClosed: Boolean = false
         if (navigation_drawer_layout_id.isDrawerOpen(GravityCompat.START)) {
             navigation_drawer_layout_id.closeDrawer(GravityCompat.START)
+            isClosed = true
         }
-        val bundle = Bundle()
-        bundle.putString(Constants.BUNDLE_NEWS_URL, url)
-        this.navController.navigate(R.id.newsView_id, bundle)
+        emit(isClosed)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         this.iSharedPref.unregisterOnSharedPrefListener(this)
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = this.job + Dispatchers.Main
 }

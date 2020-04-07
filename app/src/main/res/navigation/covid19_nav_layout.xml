@@ -13,8 +13,8 @@
         <action
             android:id="@+id/action_live_data_map_view_to_news"
             app:destination="@id/newsView_id"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit" />
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/newsView_id"

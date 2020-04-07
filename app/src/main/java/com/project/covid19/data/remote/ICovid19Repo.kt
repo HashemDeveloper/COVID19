@@ -7,5 +7,5 @@ import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
 interface ICovid19Repo {
     fun getCSSELiveData(): LiveData<DataHandler<List<HopkinsCSSEDataRes>>>?
     fun fetchAndSaveCSSEData()
-    fun getCOVID19News(location: String): LiveData<DataHandler<COVIDSmartTableAIRes>>?
+    fun getCOVID19News(url: String): LiveData<DataHandler<COVIDSmartTableAIRes>>?
 }
