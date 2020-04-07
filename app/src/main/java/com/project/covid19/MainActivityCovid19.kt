@@ -11,6 +11,9 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 import com.project.covid19.data.local.ISharedPref
 import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
@@ -39,6 +42,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+
 class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
     SharedPreferences.OnSharedPreferenceChangeListener, DrawerItemAdapter.OnNewsItemClickListener, CoroutineScope {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -62,6 +66,10 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
+        AppCenter.start(
+            application, "29bb1d21-67cf-40a6-b1ef-ab54235967a1",
+            Analytics::class.java, Crashes::class.java
+        )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         this.navController = Navigation.findNavController(this, R.id.container)

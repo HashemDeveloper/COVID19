@@ -81,6 +81,7 @@ ext {
     youtubePlayerVersion = '10.0.5'
     threeTenAbpVersion = '1.0.5'
     googleMap = "17.0.0"
+    appCenterSdkVersion = '3.1.0'
 }
 task clean(type: Delete) {
     delete rootProject.buildDir
