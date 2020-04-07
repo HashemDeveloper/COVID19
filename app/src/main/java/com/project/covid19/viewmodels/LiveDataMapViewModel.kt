@@ -1,5 +1,6 @@
 package com.project.covid19.viewmodels
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -8,12 +9,14 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.project.covid19.data.local.SharedPref
 import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
 import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.hopkinsdata.SearchHopkinData
+import com.project.covid19.model.smartableai.COVIDSmartTableAIRes
 import com.project.covid19.utils.Constants
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.utils.search.ISearchSuggestion
@@ -25,20 +28,25 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
     private var confirmedCircle: Circle?= null
     private var deathStatCircle: Circle?= null
     @Inject
+    lateinit var iSharedPref: SharedPref
+    @Inject
     lateinit var iRxEvents: IRxEvents
     @Inject
     lateinit var covid19Repo: ICovid19Repo
     @Inject
     lateinit var iSearchSuggestion: ISearchSuggestion
     private var cssDataLiveData: LiveData<DataHandler<List<HopkinsCSSEDataRes>>>?= null
+    private var covid19NewsData: LiveData<DataHandler<COVIDSmartTableAIRes>>?= null
 
-    fun getCssDataLiveData(): LiveData<DataHandler<List<HopkinsCSSEDataRes>>>? {
-        this.cssDataLiveData = this.covid19Repo.getCSSELiveData()
-        return cssDataLiveData
-    }
     fun fetchAndSaveData() {
         this.covid19Repo.fetchAndSaveCSSEData()
     }
+
+    fun getCOVID19NewsLiveData(location: String): LiveData<DataHandler<COVIDSmartTableAIRes>>? {
+        this.covid19NewsData = this.covid19Repo.getCOVID19News(location)
+        return this.covid19NewsData
+    }
+
 
     fun findSuggestions(newQuery: String, searchView: FloatingSearchView?) {
         searchView?.showProgress()
@@ -113,6 +121,12 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
                 }
             }
         }
+    }
+    fun getIsNightModeOn(): Boolean {
+        return this.iSharedPref.getIsNightModeOn()
+    }
+    fun setupSharedPrefChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        this.iSharedPref.registerOnSharedPrefListener(listener)
     }
 
     fun getDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {

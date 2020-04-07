@@ -19,6 +19,7 @@ android {
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "google_map_key", (project.findProperty("GOOGLE_MAP_KEY") ?: "")
+        resValue "string", "smart_table_sub_primary_key", (project.findProperty("SMART_TABLE_SUB_PRIMARY_KEY"))
     }
 
     buildTypes {

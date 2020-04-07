@@ -26,6 +26,11 @@ class ApplicationModule {
     }
     @Singleton
     @Provides
+    fun initiateSharedPref(context: Context): SharedPref {
+        return SharedPref.invoke(context)
+    }
+    @Singleton
+    @Provides
     fun provideSharedPref(sharedPref: SharedPref): ISharedPref {
         return sharedPref
     }

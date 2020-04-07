@@ -10,6 +10,7 @@ import javax.inject.Inject
 class SharedPref @Inject constructor(): ISharedPref {
 
     companion object {
+        private var listener: SharedPreferences.OnSharedPreferenceChangeListener? =null
         private var pref: SharedPreferences?= null
         @Volatile
         private var instance: SharedPref?= null
@@ -34,5 +35,16 @@ class SharedPref @Inject constructor(): ISharedPref {
 
     override fun getIsNightModeOn(): Boolean {
         return pref?.getBoolean(Constants.IS_NIGHT_MODE, false)!!
+    }
+
+    override fun registerOnSharedPrefListener(sharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        listener = sharedPrefListener
+    }
+
+    override fun unregisterOnSharedPrefListener(sharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        listener = sharedPrefListener
+        if (listener != null) {
+            listener = null
+        }
     }
 }
