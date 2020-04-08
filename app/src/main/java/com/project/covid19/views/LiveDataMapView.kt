@@ -102,11 +102,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
             googleMap.uiSettings.isMyLocationButtonEnabled = true
             setupCurrentLocationAndState(true)
             listenForCameraChange()
-            activity?.let {
-                if (!it.isDestroyed) {
-                    this.liveDataMapViewModel.drawVisualData(googleMap)
-                }
-            }
+            drawDataStatistic()
         }
     }
 
@@ -271,6 +267,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                         googleMap!!.isMyLocationEnabled = true
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
                         setupCurrentLocationAndState(true)
+                        drawDataStatistic()
                     }
                 }
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -279,6 +276,7 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                         googleMap!!.isMyLocationEnabled = true
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
                         setupCurrentLocationAndState(true)
+                        drawDataStatistic()
                     }
                 }
             } else {
@@ -287,8 +285,17 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
                         googleMap!!.isMyLocationEnabled = true
                         googleMap!!.uiSettings.isMyLocationButtonEnabled = true
                         setupCurrentLocationAndState(true)
+                        drawDataStatistic()
                     }
                 }
+            }
+        }
+    }
+
+    private fun drawDataStatistic() {
+        activity?.let {
+            if (!it.isDestroyed) {
+                this.liveDataMapViewModel.drawVisualData(this.googleMap!!)
             }
         }
     }
