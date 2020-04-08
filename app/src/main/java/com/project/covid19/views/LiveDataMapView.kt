@@ -166,8 +166,10 @@ class LiveDataMapView : Fragment(), Injectable, OnMapReadyCallback {
         this.googleMap?.setOnCameraIdleListener {
             if (googleMap?.isMyLocationEnabled!!) {
                 this.googleMap?.uiSettings?.isMyLocationButtonEnabled = true
-                val fadeInAnim: Animation = AnimationUtils.loadAnimation(context, R.anim.anim_fade_in)
-                getMapLocationBt()?.animation = fadeInAnim
+                this.context?.let {
+                    val fadeInAnim: Animation = AnimationUtils.loadAnimation(it, R.anim.anim_fade_in)
+                    getMapLocationBt()?.animation = fadeInAnim
+                }
             }
             if (live_data_search_view_id?.visibility == View.GONE) {
                 live_data_search_view_id?.visibility = View.VISIBLE

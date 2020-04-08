@@ -41,6 +41,10 @@ data class HopkinsCSSEDataRes(
     var isHistory: Boolean
 ): Parcelable, SearchSuggestion {
     override fun getBody(): String {
-        return this.country + (if (province != null) ", $province" else "")
+        return if (province != null && province?.isNotEmpty()!!) {
+            this.country + ", $province"
+        } else {
+            this.country!!
+        }
     }
 }

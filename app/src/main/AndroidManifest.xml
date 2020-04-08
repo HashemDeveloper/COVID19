@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.project.covid19">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -22,7 +23,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivityCovid19"
             android:theme="@style/Splash"
-            >
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW"/>

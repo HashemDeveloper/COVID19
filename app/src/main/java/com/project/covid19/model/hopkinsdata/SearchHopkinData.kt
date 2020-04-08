@@ -36,7 +36,7 @@ data class SearchHopkinData(
     var isHistory: Boolean
 ): Parcelable, SearchSuggestion {
     override fun getBody(): String {
-        return if (province != null) {
+        return if (province != null && province?.isNotEmpty()!!) {
             this.country + ", $province"
         } else {
             this.country!!

@@ -92,6 +92,7 @@
                 android:textSize="12sp"
                 android:textStyle="italic"
                 android:layout_gravity="end"
+                android:textColor="@color/light_gray"
                 />
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/fragment_live_data_updated_view_id"
@@ -101,6 +102,7 @@
                 android:textSize="12sp"
                 android:textStyle="italic"
                 android:layout_gravity="end"
+                android:textColor="@color/light_gray"
                 />
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/fragment_live_data_credit_view_id"
@@ -110,6 +112,7 @@
                 android:textSize="12sp"
                 android:textStyle="italic"
                 android:layout_gravity="end"
+                android:textColor="@color/light_gray"
                 />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

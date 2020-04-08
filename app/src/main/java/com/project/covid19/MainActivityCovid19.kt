@@ -198,6 +198,11 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
         this.iSharedPref.unregisterOnSharedPrefListener(this)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setContentView(R.layout.activity_main)
+    }
+
     override val coroutineContext: CoroutineContext
         get() = this.job + Dispatchers.Main
 }
