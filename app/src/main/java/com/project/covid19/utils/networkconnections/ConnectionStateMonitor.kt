@@ -2,7 +2,10 @@ package com.project.covid19.utils.networkconnections
 
 import android.content.Context
 import android.content.IntentFilter
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
 import android.widget.Toast
@@ -184,6 +187,8 @@ class ConnectionStateMonitor @Inject constructor(private val context: Context) :
         override fun onUnavailable() {
             this.isNetCallBackRegistered = true
             this.connectionStateMonitor.postValue(false)
+
+            Toast.makeText(this.context, "No Internet Available", Toast.LENGTH_SHORT).show()
         }
 
         override fun onCapabilitiesChanged(

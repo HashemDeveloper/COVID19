@@ -19,6 +19,7 @@ import com.project.covid19.di.viewmodel.ViewModelFactory
 import com.project.covid19.events.DrawerLayoutEvent
 import com.project.covid19.events.NetworkStateEvent
 import com.project.covid19.utils.Constants
+import com.project.covid19.utils.networkconnections.ConnectionSettings
 import com.project.covid19.utils.networkconnections.IConnectionStateMonitor
 import com.project.covid19.utils.rxevents.IRxEvents
 import com.project.covid19.viewmodels.LiveDataMapViewModel
@@ -59,6 +60,7 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
     lateinit var iConnectionStateMonitor: IConnectionStateMonitor
     @Inject
     lateinit var viewModeLFactory: ViewModelFactory
+    private var conectionSettings: ConnectionSettings?= null
     private val liveDataMapViewModel: LiveDataMapViewModel by viewModels {
         this.viewModeLFactory
     }
@@ -79,6 +81,8 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
         this.navController = Navigation.findNavController(this, R.id.container)
         this.navController.setGraph(R.navigation.covid19_nav_layout)
         navigation_view_id?.setupWithNavController(this.navController)
+        this.conectionSettings = ConnectionSettings(this, container.view!!)
+        this.conectionSettings?.build()
     }
 
     override fun onStart() {
@@ -135,20 +139,27 @@ class MainActivityCovid19 : AppCompatActivity(), HasSupportFragmentInjector,
         }
     }
     private fun monitorConnectionState() {
+        var isConnected: Boolean
+        val isNightMode: Boolean = this.iSharedPref.getIsNightModeOn()
         this.iConnectionStateMonitor.getObserver().observe(this, androidx.lifecycle.Observer {isNetAvailAble ->
             if (isNetAvailAble) {
                 this.iConnectionStateMonitor.isConnectedNoInternetLiveData().observe(this, observeNotInternetConnectedLiveData())
                 this.liveDataMapViewModel.setupNetConnection(NetworkStateEvent(true))
+                isConnected = true
             } else {
                 this.liveDataMapViewModel.setupNetConnection(NetworkStateEvent(false))
+                isConnected = false
             }
+            conectionSettings?.initWifiSetting(isConnected, isNightMode)
         })
     }
     private fun observeNotInternetConnectedLiveData(): androidx.lifecycle.Observer<Boolean> {
+
         return androidx.lifecycle.Observer {
             if (BuildConfig.DEBUG) {
                 Timber.i("No Internet $it.toString()")
             }
+
         }
     }
 
