@@ -10,7 +10,7 @@ fun <T> covidLiveDataExt(network: suspend() ->DataHandler<T>): LiveData<DataHand
         val responseStatus: DataHandler<T> = network.invoke()
         if (responseStatus.status == DataHandler.Status.SUCCESS) {
             emit(DataHandler.onSuccess(responseStatus.data!!))
-        } else if (responseStatus.status == DataHandler.Status.LOADING) {
-            emit(DataHandler.onError(responseStatus.message!!))
+        } else if (responseStatus.status == DataHandler.Status.ERROR) {
+            emit(DataHandler.onError(responseStatus.message!!, null))
         }
     }

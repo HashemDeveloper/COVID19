@@ -88,7 +88,7 @@ class DrawerItemAdapter constructor(private var context: Context, private var li
                     if (it.backgroundImage.isNotEmpty()) {
                         //Display image of top headings
                     } else {
-                        bgImageView.setImageResource(R.drawable.covid_message_image_medium)
+                        bgImageView.setImageResource(R.drawable.covid19_background_image)
                     }
                 }
             }

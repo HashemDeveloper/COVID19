@@ -13,6 +13,7 @@ import com.project.covid19.data.local.SharedPref
 import com.project.covid19.data.remote.DataHandler
 import com.project.covid19.data.remote.ICovid19Repo
 import com.project.covid19.events.DrawerLayoutEvent
+import com.project.covid19.events.NetworkStateEvent
 import com.project.covid19.model.hopkinsdata.Coordinates
 import com.project.covid19.model.hopkinsdata.HopkinsCSSEDataRes
 import com.project.covid19.model.hopkinsdata.SearchHopkinData
@@ -131,5 +132,9 @@ class LiveDataMapViewModel @Inject constructor(): ViewModel() {
 
     fun getDataByCoordinates(coordinates: Coordinates): HopkinsCSSEDataRes? {
         return this.iSearchSuggestion.getHopkingsDataByCoordinates(coordinates)
+    }
+
+    fun setupNetConnection(networkStateEvent: NetworkStateEvent) {
+
     }
 }
