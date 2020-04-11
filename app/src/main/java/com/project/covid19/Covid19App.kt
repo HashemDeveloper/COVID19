@@ -2,6 +2,8 @@ package com.project.covid19
 
 import android.app.Application
 import android.app.Service
+import android.content.Context
+import androidx.multidex.MultiDex
 import com.facebook.stetho.Stetho
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.project.covid19.di.ApplicationInjector
@@ -36,5 +38,10 @@ class Covid19App: Application(), HasAndroidInjector, HasServiceInjector {
 
     override fun serviceInjector(): AndroidInjector<Service> {
        return this.dispatchServiceInjector
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 }
